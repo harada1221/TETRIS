@@ -16,11 +16,14 @@ public class MinoScript : MonoBehaviour
     private Vector3 _fallDistance = default;
     [SerializeField, Header("É~ÉmÇ™ç∂âEìÆÇ≠ãóó£")]
     private Vector3 _moveDistance = default;
+    private Vector3 _rotationPoint = default;
+    private Vector3 _rotaionZ = default;
     // Update is called once per frame
     private void Start()
     {
         _fallDistance = new Vector3(0, -1, 0);
         _moveDistance = new Vector3(1, 0, 0);
+        _rotaionZ = new Vector3(0, 0, 1);
     }
     private void Update()
     {
@@ -50,6 +53,14 @@ public class MinoScript : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.S))
         {
             _fallTime = 10f;
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            transform.RotateAround(transform.TransformPoint(_rotationPoint), _rotaionZ, -90);
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            transform.RotateAround(transform.TransformPoint(_rotationPoint), _rotaionZ, 90);
         }
     }
 }
