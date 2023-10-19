@@ -2,6 +2,7 @@
 // #SCRIPTNAME#.cs
 //
 // ì¬“ú10ŒŽ17“ú:
+// XV“ú10ŒŽ18“ú:
 // ì¬ŽÒ:Œ´“c
 // ---------------------------------------------------------
 using System.Collections;
@@ -18,6 +19,26 @@ public class MinoScript : MonoBehaviour
     private Vector3 _moveDistance = default;
     private Vector3 _rotationPoint = default;
     private Vector3 _rotaionZ = default;
+    private MinoType _minoTpe = default;
+    private RotationType _rotationType = RotationType.TOP;
+    public enum MinoType
+    {
+        IMINO,
+        TMINO,
+        ZMINO,
+        SMINO,
+        LMINO,
+        JMINO,
+        OMINO
+    }
+    public enum RotationType
+    {
+        TOP,
+        RIGHT,
+        LEFT,
+        BOTTOM
+    }
+    public MinoType GetminoType { get => _minoTpe; }
     // Update is called once per frame
     private void Start()
     {

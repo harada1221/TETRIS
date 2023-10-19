@@ -261,6 +261,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1342803563272318540}
+  - component: {fileID: 3299994516104518631}
   m_Layer: 0
   m_Name: Lmino
   m_TagString: Untagged
@@ -287,6 +288,21 @@ Transform:
   - {fileID: 6397807248570218684}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3299994516104518631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6608855794110198299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd44a98df6deb7444a163e7c0dc47b11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _fallTime: 10
+  _fallDistance: {x: 0, y: 0, z: 0}
+  _moveDistance: {x: 0, y: 0, z: 0}
 --- !u!1 &8527124326836376565
 GameObject:
   m_ObjectHideFlags: 0

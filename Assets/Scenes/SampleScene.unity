@@ -331,6 +331,16 @@ MonoBehaviour:
   _positionX: -5
   _positionY: 5
   _wallBlock: {fileID: 8544873061195400971, guid: 099386ed3a29e27409309225a2831f92, type: 3}
+  _minoBlock:
+  - {fileID: 6424367402614012549, guid: e65c386e9ed92444fa9298ba5ad8454b, type: 3}
+  - {fileID: 6571654301454228817, guid: 70bf7216323203a439e5c459d21eca74, type: 3}
+  - {fileID: 6608855794110198299, guid: 49403500c892a48448151380f904d081, type: 3}
+  - {fileID: 2807354460131813016, guid: 760a151b9b997fb489561ccfe96c26eb, type: 3}
+  - {fileID: 5784365157272295289, guid: 76ca6051c86b752479dd35c5b0c8d571, type: 3}
+  - {fileID: 8387473003982416281, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
+  - {fileID: 6748049474050921691, guid: 8c877b433467b224ca10d149fb81d0bf, type: 3}
+  _fallBlockInitPosX: 6
+  _fallBlockInitPosY: -1
 --- !u!4 &668807559
 Transform:
   m_ObjectHideFlags: 0
@@ -438,6 +448,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -2273722017582498831, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1037917475825094190, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalPosition.y
       value: 3
@@ -541,6 +555,10 @@ PrefabInstance:
     - target: {fileID: 6571654301454228817, guid: 70bf7216323203a439e5c459d21eca74, type: 3}
       propertyPath: m_Name
       value: Jmino
+      objectReference: {fileID: 0}
+    - target: {fileID: 6571654301454228817, guid: 70bf7216323203a439e5c459d21eca74, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8729202803564506368, guid: 70bf7216323203a439e5c459d21eca74, type: 3}
       propertyPath: m_LocalPosition.x
