@@ -26,7 +26,7 @@ public class GameControllerScript : MonoBehaviour
     private int _fallBlockInitPosY = default; // 落下ブロックの初期位置:Y座標
     private int _fallBlockPosX = default; // 落下ブロックのX座標
     private int _fallBlockPosY = default; // 落下ブロックのY座標
-    private int[,] fallBlockStat = new int[4, 4]; // 落下ブロック状態
+    private int[,] _fallBlockStat = new int[4, 4]; // 落下ブロック状態
     private MinoScript _minoScript = default;
 
     private int _blockNum; // ブロック種類
@@ -81,8 +81,8 @@ public class GameControllerScript : MonoBehaviour
         _blockNum = Random.Range(0, 7);
         _rot = 0;
         _minoScript = _minoBlock[_blockNum].GetComponent<MinoScript>();
-        fallBlockStat = _fallBlockSet.set(_minoScript, _rot);
-        Instantiate(_minoBlock[_blockNum], new Vector3(_fallBlockPosX + _positionX, -_fallBlockPosY + _positionY, 0), Quaternion.identity);
+        _fallBlockStat = _fallBlockSet.set(_minoScript);
+        Instantiate(_minoBlock[5], new Vector3(_fallBlockPosX + _positionX, -_fallBlockPosY + _positionY, 0), Quaternion.identity);
     }
     //private void Update()
     //{
@@ -102,7 +102,7 @@ public class GameControllerScript : MonoBehaviour
     {
         bool groundFlg = false;
         int[,] block = new int[4, 4];
-        block = _fallBlockSet.set(minoScript, rot);
+        block = _fallBlockSet.set(minoScript);
         for (int i = 0; i < 4; i++)
         {
             for (int j = 3; j >= 0; j--)

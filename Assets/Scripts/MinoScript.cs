@@ -18,10 +18,11 @@ public class MinoScript : MonoBehaviour
     private Vector3 _moveDistance = default;//ƒ~ƒm‚ª¶‰E“®‚­‹——£
     private Vector3 _rotationPoint = default;//ƒ~ƒm‚Ì’†S
     private Vector3 _rotaionZ = default;//‰ñ“]‚ÌŒü‚«
+    private Vector3 _worldAngle = default;//ƒ~ƒm‚ÌŠp“x
 
-    private Transform _mytransform = default;
+    private Transform _myTransform = default;
 
-    [SerializeField,Header("ƒ~ƒm‚ÌŽí—Þ")]
+    [SerializeField, Header("ƒ~ƒm‚ÌŽí—Þ")]
     private MinoType _minoType = default;
     //ƒ~ƒm‚Ì‰ñ“]‚ÌŒü‚«
     private RotationMinoType _rotationType = RotationMinoType.TOP;
@@ -51,6 +52,7 @@ public class MinoScript : MonoBehaviour
         _moveDistance = new Vector3(1, 0, 0);
         _rotaionZ = new Vector3(0, 0, 1);
         _fallTimeSave = _fallTime;
+        _myTransform = this.transform;
     }
     private void Update()
     {
@@ -90,11 +92,39 @@ public class MinoScript : MonoBehaviour
         //ƒ~ƒm‚ð‰ñ“]‚³‚¹‚é
         if (Input.GetKeyDown(KeyCode.E))
         {
-            transform.RotateAround(transform.TransformPoint(_rotationPoint), _rotaionZ, -90);
+            transform.RotateAround(transform.TransformPoint(_rotationPoint), _rotaionZ, 270);
+            AngleCheck();
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
             transform.RotateAround(transform.TransformPoint(_rotationPoint), _rotaionZ, 90);
+            AngleCheck();
+        }
+    }
+    private void AngleCheck()
+    {
+        _worldAngle = _myTransform.eulerAngles;
+        float angle = _worldAngle.z;
+        for (float i = _worldAngle.z; i >= 4;)
+        {
+            i = angle / 90;
+            angle = i;
+        }
+        if (angle == 0)
+        {
+            _rotationType = RotationMinoType.TOP;
+        }
+        if (angle == 1)
+        {
+            _rotationType = RotationMinoType.LEFT;
+        }
+        if (angle == 2)
+        {
+            _rotationType = RotationMinoType.BOTTOM;
+        }
+        if (angle == 3)
+        {
+            _rotationType = RotationMinoType.RIGHT;
         }
     }
 }

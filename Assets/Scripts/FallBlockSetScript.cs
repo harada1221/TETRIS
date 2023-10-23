@@ -141,48 +141,48 @@ public class FallBlockSet
         {0,0,0,0},
         {0,0,0,0}
     };
-    public int[,] set(MinoScript minoType, int rot)
+    public int[,] set(MinoScript minoscript)
     {
-        if (minoType.GetminoType == MinoScript.MinoType.TMINO)
+        if (minoscript.GetminoType == MinoScript.MinoType.TMINO)
         {
-            if (rot == 0) return TMinoTop;
-            else if (rot == 1) return TMinoRight;
-            else if (rot == 2) return TMinoBottom;
+            if (minoscript.GetRotationType == MinoScript.RotationMinoType.TOP) return TMinoTop;
+            else if (minoscript.GetRotationType == MinoScript.RotationMinoType.RIGHT) return TMinoRight;
+            else if (minoscript.GetRotationType == MinoScript.RotationMinoType.BOTTOM) return TMinoBottom;
             else return TMinoLeft;
         }
-        else if (minoType.GetminoType == MinoScript.MinoType.JMINO)
+        else if (minoscript.GetminoType == MinoScript.MinoType.JMINO)
         {
-            if (rot == 0) return JMInoRight;
-            else if (rot == 1) return JMinoBottom;
-            else if (rot == 2) return JMinoLeft;
-            else return JMinoTop;
+            if (minoscript.GetRotationType == MinoScript.RotationMinoType.RIGHT) return JMInoRight;
+            else if (minoscript.GetRotationType == MinoScript.RotationMinoType.BOTTOM) return JMinoBottom;
+            else if (minoscript.GetRotationType == MinoScript.RotationMinoType.TOP) return JMinoTop;
+            else return JMinoLeft;
         }
-        else if (minoType.GetminoType == MinoScript.MinoType.LMINO)
+        else if (minoscript.GetminoType == MinoScript.MinoType.LMINO)
         {
-            if (rot == 0) return LMinoLeft;
-            else if (rot == 1) return LMinoTop;
-            else if (rot == 2) return LMinoRight;
+            if (minoscript.GetRotationType == MinoScript.RotationMinoType.LEFT) return LMinoLeft;
+            else if (minoscript.GetRotationType == MinoScript.RotationMinoType.TOP) return LMinoTop;
+            else if (minoscript.GetRotationType == MinoScript.RotationMinoType.RIGHT) return LMinoRight;
             else return LMinoBottom;
         }
-        else if (minoType.GetminoType == MinoScript.MinoType.SMINO)
+        else if (minoscript.GetminoType == MinoScript.MinoType.SMINO)
         {
-            if (rot == 0 | rot == 2) return SMinoSide;
+            if (minoscript.GetRotationType == MinoScript.RotationMinoType.LEFT | minoscript.GetRotationType == MinoScript.RotationMinoType.RIGHT) return SMinoSide;
             else return SMinoTop;
 
         }
-        else if (minoType.GetminoType == MinoScript.MinoType.ZMINO)
+        else if (minoscript.GetminoType == MinoScript.MinoType.ZMINO)
         {
-            if (rot == 0 | rot == 2) return ZMinoSide;
+            if (minoscript.GetRotationType == MinoScript.RotationMinoType.LEFT | minoscript.GetRotationType == MinoScript.RotationMinoType.RIGHT) return ZMinoSide;
             else return ZMinoTop;
 
         }
-        else if (minoType.GetminoType == MinoScript.MinoType.IMINO)
+        else if (minoscript.GetminoType == MinoScript.MinoType.IMINO)
         {
-            if (rot == 0 | rot == 2) return IMinoTop;
-            else return IMinoSide;
+            if (minoscript.GetRotationType == MinoScript.RotationMinoType.LEFT | minoscript.GetRotationType == MinoScript.RotationMinoType.RIGHT) return IMinoSide;
+            else return IMinoTop;
 
         }
-        else if (minoType.GetminoType == MinoScript.MinoType.OMINO)
+        else if (minoscript.GetminoType == MinoScript.MinoType.OMINO)
         {
             return OMinoTop;
         }
