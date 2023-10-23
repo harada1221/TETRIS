@@ -9,7 +9,6 @@ using UnityEngine;
 
 public class FallBlockSet
 {
-    private MinoScript _minoScript = default;
     private int[,] TMinoTop = new int[4, 4]{
         {0,2,0,0},
         {2,2,2,0},
@@ -142,48 +141,48 @@ public class FallBlockSet
         {0,0,0,0},
         {0,0,0,0}
     };
-    public int[,] set(int blockNum, int rot)
+    public int[,] set(MinoScript minoType, int rot)
     {
-        if (blockNum == 0)
+        if (minoType.GetminoType == MinoScript.MinoType.TMINO)
         {
             if (rot == 0) return TMinoTop;
             else if (rot == 1) return TMinoRight;
             else if (rot == 2) return TMinoBottom;
             else return TMinoLeft;
         }
-        else if (blockNum == 1)
+        else if (minoType.GetminoType == MinoScript.MinoType.JMINO)
         {
             if (rot == 0) return JMInoRight;
             else if (rot == 1) return JMinoBottom;
             else if (rot == 2) return JMinoLeft;
             else return JMinoTop;
         }
-        else if (blockNum == 2)
+        else if (minoType.GetminoType == MinoScript.MinoType.LMINO)
         {
             if (rot == 0) return LMinoLeft;
             else if (rot == 1) return LMinoTop;
             else if (rot == 2) return LMinoRight;
             else return LMinoBottom;
         }
-        else if (blockNum == 3)
+        else if (minoType.GetminoType == MinoScript.MinoType.SMINO)
         {
             if (rot == 0 | rot == 2) return SMinoSide;
             else return SMinoTop;
 
         }
-        else if (blockNum == 4)
+        else if (minoType.GetminoType == MinoScript.MinoType.ZMINO)
         {
             if (rot == 0 | rot == 2) return ZMinoSide;
             else return ZMinoTop;
 
         }
-        else if (blockNum == 5)
+        else if (minoType.GetminoType == MinoScript.MinoType.IMINO)
         {
             if (rot == 0 | rot == 2) return IMinoTop;
             else return IMinoSide;
 
         }
-        else if (blockNum == 6)
+        else if (minoType.GetminoType == MinoScript.MinoType.OMINO)
         {
             return OMinoTop;
         }

@@ -438,8 +438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fallTime: 10
-  _fallDistance: {x: 0, y: 0, z: 0}
-  _moveDistance: {x: 0, y: 0, z: 0}
+  _minoType: 0
 --- !u!1001 &1063172017
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -458,11 +457,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 2.4996252
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6
+      value: 8.456015
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -470,19 +469,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.71329916
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.70085967
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -494,7 +493,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1261381178728669839, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 88.992
       objectReference: {fileID: 0}
     - target: {fileID: 2561777589181621696, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -542,8 +541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fallTime: 10
-  _fallDistance: {x: 0, y: -1, z: 0}
-  _moveDistance: {x: 1, y: 0, z: 0}
+  _minoType: 0
 --- !u!1001 &1098321269
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -626,8 +624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fallTime: 10
-  _fallDistance: {x: 0, y: 0, z: 0}
-  _moveDistance: {x: 0, y: 0, z: 0}
+  _minoType: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

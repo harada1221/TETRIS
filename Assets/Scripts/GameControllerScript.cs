@@ -2,7 +2,7 @@
 // #SCRIPTNAME#.cs
 //
 //作成日10月17日:
-// 作成日10月18日:
+// 編集日10月18日:
 // 作成者:原田
 // ---------------------------------------------------------using System.Collections;
 using System.Collections;
@@ -13,8 +13,8 @@ public class GameControllerScript : MonoBehaviour
 {
     [SerializeField, Header("原点座標")]
     private float _positionX = default, _positionY = default;
-    private GameObject[,] _blockObj = new GameObject[21, 14]; // 表示ブロックオブジェクト
-    private GameObject[,] _fallBlockObj = new GameObject[4, 4]; // 落下ブロックオブジェクト
+    //private GameObject[,] _blockObj = new GameObject[21, 14]; // 表示ブロックオブジェクト
+    //private GameObject[,] _fallBlockObj = new GameObject[4, 4]; // 落下ブロックオブジェクト
     [SerializeField, Header("壁ブロックのプレハブ")]
     private GameObject _wallBlock = default;
     [SerializeField, Header("ブロックのPrehab")]
@@ -27,6 +27,7 @@ public class GameControllerScript : MonoBehaviour
     private int _fallBlockPosX = default; // 落下ブロックのX座標
     private int _fallBlockPosY = default; // 落下ブロックのY座標
     private int[,] fallBlockStat = new int[4, 4]; // 落下ブロック状態
+    private MinoScript _minoScript = default;
 
     private int _blockNum; // ブロック種類
     private int _rot; // ブロック回転状態
@@ -79,7 +80,8 @@ public class GameControllerScript : MonoBehaviour
 
         _blockNum = Random.Range(0, 7);
         _rot = 0;
-        fallBlockStat = _fallBlockSet.set(_blockNum, _rot);
+        _minoScript = _minoBlock[_blockNum].GetComponent<MinoScript>();
+        fallBlockStat = _fallBlockSet.set(_minoScript, _rot);
         Instantiate(_minoBlock[_blockNum], new Vector3(_fallBlockPosX + _positionX, -_fallBlockPosY + _positionY, 0), Quaternion.identity);
     }
     //private void Update()
@@ -96,4 +98,25 @@ public class GameControllerScript : MonoBehaviour
     //        }
     //    }
     //}
+    public bool judgeGround(MinoScript minoScript, int rot, int[,] blockStat, int x, int y)
+    {
+        bool groundFlg = false;
+        int[,] block = new int[4, 4];
+        block = _fallBlockSet.set(minoScript, rot);
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 3; j >= 0; j--)
+            {
+                if (block[j, i] == 2)
+                {
+                    if (blockStat[y + j + 1, x + i] == 1 || blockStat[y + j + 1, x + i] == 3)
+                    {
+                        groundFlg = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return groundFlg;
+    }
 }

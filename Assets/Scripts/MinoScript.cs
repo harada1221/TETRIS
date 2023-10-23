@@ -2,7 +2,6 @@
 // #SCRIPTNAME#.cs
 //
 // 作成日10月17日:
-// 更新日10月18日:
 // 作成者:原田
 // ---------------------------------------------------------
 using System.Collections;
@@ -12,15 +11,20 @@ public class MinoScript : MonoBehaviour
 {
     [SerializeField, Header("ミノの落ちる時間")]
     private float _fallTime = default;
-    private float _timeCount = default;
-    [SerializeField, Header("ミノが下動く距離")]
-    private Vector3 _fallDistance = default;
-    [SerializeField, Header("ミノが左右動く距離")]
-    private Vector3 _moveDistance = default;
-    private Vector3 _rotationPoint = default;
-    private Vector3 _rotaionZ = default;
-    private MinoType _minoTpe = default;
-    private RotationType _rotationType = RotationType.TOP;
+    private float _fallTimeSave = default;//ミノの落ちる時間を保存
+    private float _timeCount = default;//ミノの落ちる時間を比較する
+
+    private Vector3 _fallDistance = default;//ミノが下動く距離
+    private Vector3 _moveDistance = default;//ミノが左右動く距離
+    private Vector3 _rotationPoint = default;//ミノの中心
+    private Vector3 _rotaionZ = default;//回転の向き
+
+    private Transform _mytransform = default;
+
+    [SerializeField,Header("ミノの種類")]
+    private MinoType _minoType = default;
+    //ミノの回転の向き
+    private RotationMinoType _rotationType = RotationMinoType.TOP;
     public enum MinoType
     {
         IMINO,
@@ -31,20 +35,22 @@ public class MinoScript : MonoBehaviour
         JMINO,
         OMINO
     }
-    public enum RotationType
+    public enum RotationMinoType
     {
         TOP,
         RIGHT,
         LEFT,
         BOTTOM
     }
-    public MinoType GetminoType { get => _minoTpe; }
+    public MinoType GetminoType { get => _minoType; }
+    public RotationMinoType GetRotationType { get => _rotationType; }
     // Update is called once per frame
     private void Start()
     {
         _fallDistance = new Vector3(0, -1, 0);
         _moveDistance = new Vector3(1, 0, 0);
         _rotaionZ = new Vector3(0, 0, 1);
+        _fallTimeSave = _fallTime;
     }
     private void Update()
     {
@@ -53,28 +59,35 @@ public class MinoScript : MonoBehaviour
     private void MoveMino()
     {
         _timeCount += 20 * Time.deltaTime;
+        //一定時間たったらミノを落下させる
         if (_timeCount > _fallTime)
         {
             transform.position += _fallDistance;
             _timeCount = 0;
         }
+        //ミノを左に動かす
         if (Input.GetKeyDown(KeyCode.A))
         {
             transform.position -= _moveDistance;
         }
+        //ミノを右に動かす
         else if (Input.GetKeyDown(KeyCode.D))
         {
             transform.position += _moveDistance;
         }
+        //ミノの落下速度をあげる
         if (Input.GetKeyDown(KeyCode.S))
         {
             transform.position += _fallDistance;
+            _fallTimeSave = _fallTime;
             _fallTime = _fallTime * 0.1f;
         }
+        //ミノの落下速度を元に戻す
         if (Input.GetKeyUp(KeyCode.S))
         {
-            _fallTime = 10f;
+            _fallTime = _fallTimeSave;
         }
+        //ミノを回転させる
         if (Input.GetKeyDown(KeyCode.E))
         {
             transform.RotateAround(transform.TransformPoint(_rotationPoint), _rotaionZ, -90);

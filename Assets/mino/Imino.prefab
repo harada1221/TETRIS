@@ -301,8 +301,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fallTime: 10
-  _fallDistance: {x: 0, y: 0, z: 0}
-  _moveDistance: {x: 0, y: 0, z: 0}
+  _minoType: 0
 --- !u!1 &8831025710153659889
 GameObject:
   m_ObjectHideFlags: 0

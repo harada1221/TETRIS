@@ -219,6 +219,7 @@ MonoBehaviour:
   _fallTime: 10
   _fallDistance: {x: 0, y: 0, z: 0}
   _moveDistance: {x: 0, y: 0, z: 0}
+  _minoTpe: 2
 --- !u!1 &6959982176140172635
 GameObject:
   m_ObjectHideFlags: 0
