@@ -22,6 +22,8 @@ public class MinoScript : MonoBehaviour
 
     private Transform _myTransform = default;
 
+    private GameControllerScript _gameControllerScript = default;
+
     [SerializeField, Header("ƒ~ƒm‚ÌŽí—Þ")]
     private MinoType _minoType = default;
     //ƒ~ƒm‚Ì‰ñ“]‚ÌŒü‚«
@@ -53,6 +55,7 @@ public class MinoScript : MonoBehaviour
         _rotaionZ = new Vector3(0, 0, 1);
         _fallTimeSave = _fallTime;
         _myTransform = this.transform;
+        _gameControllerScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameControllerScript>();
     }
     private void Update()
     {
@@ -64,6 +67,7 @@ public class MinoScript : MonoBehaviour
         //ˆê’èŽžŠÔ‚½‚Á‚½‚çƒ~ƒm‚ð—Ž‰º‚³‚¹‚é
         if (_timeCount > _fallTime)
         {
+            _gameControllerScript.DownYPosition();
             transform.position += _fallDistance;
             _timeCount = 0;
         }
@@ -71,16 +75,17 @@ public class MinoScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             transform.position -= _moveDistance;
+            _gameControllerScript.LeftXPosition();
         }
         //ƒ~ƒm‚ð‰E‚É“®‚©‚·
         else if (Input.GetKeyDown(KeyCode.D))
         {
             transform.position += _moveDistance;
+            _gameControllerScript.RightXPosition();
         }
         //ƒ~ƒm‚Ì—Ž‰º‘¬“x‚ð‚ ‚°‚é
         if (Input.GetKeyDown(KeyCode.S))
         {
-            transform.position += _fallDistance;
             _fallTimeSave = _fallTime;
             _fallTime = _fallTime * 0.1f;
         }

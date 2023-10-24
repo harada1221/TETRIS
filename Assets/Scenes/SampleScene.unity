@@ -311,7 +311,7 @@ GameObject:
   - component: {fileID: 668807558}
   m_Layer: 0
   m_Name: Game Controller
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -337,10 +337,10 @@ MonoBehaviour:
   - {fileID: 6608855794110198299, guid: 49403500c892a48448151380f904d081, type: 3}
   - {fileID: 2807354460131813016, guid: 760a151b9b997fb489561ccfe96c26eb, type: 3}
   - {fileID: 5784365157272295289, guid: 76ca6051c86b752479dd35c5b0c8d571, type: 3}
-  - {fileID: 8387473003982416281, guid: c47a286a587ce3245a4ef53e4bd25cc2, type: 3}
+  - {fileID: 5519434592386327050, guid: ee55f5225774b0b4296eaae3a55de94f, type: 3}
   - {fileID: 6748049474050921691, guid: 8c877b433467b224ca10d149fb81d0bf, type: 3}
   _fallBlockInitPosX: 6
-  _fallBlockInitPosY: -1
+  _fallBlockInitPosY: 1
 --- !u!4 &668807559
 Transform:
   m_ObjectHideFlags: 0
