@@ -59,7 +59,10 @@ public class MinoScript : MonoBehaviour
     }
     private void Update()
     {
-        MoveMino();
+        if (_gameControllerScript.GetisDown == false)
+        {
+            MoveMino();
+        }
     }
     private void MoveMino()
     {
@@ -72,13 +75,13 @@ public class MinoScript : MonoBehaviour
             _timeCount = 0;
         }
         //É~ÉmÇç∂Ç…ìÆÇ©Ç∑
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.A) && _gameControllerScript.GetLeftWall == false)
         {
             transform.position -= _moveDistance;
             _gameControllerScript.LeftXPosition();
         }
         //É~ÉmÇâEÇ…ìÆÇ©Ç∑
-        else if (Input.GetKeyDown(KeyCode.D))
+        else if (Input.GetKeyDown(KeyCode.D) && _gameControllerScript.GetRightWall == false)
         {
             transform.position += _moveDistance;
             _gameControllerScript.RightXPosition();
