@@ -93,7 +93,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8729202803564506368}
-  - component: {fileID: 850975779655548025}
+  - component: {fileID: 4286430221837362014}
   m_Layer: 0
   m_Name: Jmino
   m_TagString: Untagged
@@ -120,20 +120,18 @@ Transform:
   - {fileID: 8573120428753688082}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &850975779655548025
+--- !u!114 &4286430221837362014
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6571654301454228817}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd44a98df6deb7444a163e7c0dc47b11, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e84e653115d26c43956e680d589b947, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fallTime: 10
-  _minoType: 5
 --- !u!1 &6725856774573502997
 GameObject:
   m_ObjectHideFlags: 0
