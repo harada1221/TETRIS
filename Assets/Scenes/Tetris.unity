@@ -361,7 +361,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _dropInterval: 0.25
   _nextKeyDownTimeInterval: 0.25
-  _nextKeySideTimeInterval: 0.25
+  _nextKeySideTimeInterval: 0.1
   _nextKeyRotateTimeInterval: 0.25
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
