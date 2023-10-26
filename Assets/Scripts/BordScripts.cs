@@ -36,7 +36,11 @@ public class BordScripts : MonoBehaviour
             }
         }
     }
-    //ブロックが枠内にあるかまたは下にブロックがあるかどうか
+    /// <summary>
+    /// ブロックが枠内にあるかまたは下にブロックがあるかどうか
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
     public bool CheckPosition(BlockScript block)
     {
         foreach (Transform B in block.transform)
@@ -48,7 +52,7 @@ public class BordScripts : MonoBehaviour
                 return false;
             }
         }
-        return false;
+        return true;
     }
     /// <summary>
     /// 枠内にあるかどうか判定する関数
@@ -72,7 +76,10 @@ public class BordScripts : MonoBehaviour
         //二次元配列が空いていない時と親が違うブロックの時
         return (_grid[x,y] != null && _grid[x,y].parent != block.transform);
     }
-
+    /// <summary>
+    /// 配列にブロックを格納
+    /// </summary>
+    /// <param name="block"></param>
     public void SaveBlockInGrid(BlockScript block)
     {
         foreach(Transform Item in block.transform)
