@@ -34,7 +34,7 @@ public class GameControllerScript : MonoBehaviour
     private bool isdown = false;//落下フラグ
     private bool isHitRightWall = false;//右壁のフラグ
     private bool isHitLeftWall = false;//右壁のフラグ
-    private float _groundCountTime = default; // 落下ブロックが着地してからの経過時間
+   // private float _groundCountTime = default; // 落下ブロックが着地してからの経過時間
     public bool GetisDown { get => isdown; }
     public bool GetRightWall { get => isHitRightWall; }
     public bool GetLeftWall { get => isHitLeftWall; }

@@ -47,7 +47,7 @@ public class BordScripts : MonoBehaviour
         {
             Vector2 pos = RoundingScript.Round(B.position);
 
-            if (!BoardOutCheck((int)pos.x, (int)pos.y)|| BlockCheck((int)pos.x, (int)pos.y, block))
+            if (!BoardOutCheck((int)pos.x, (int)pos.y) || BlockCheck((int)pos.x, (int)pos.y, block))
             {
                 return false;
             }
@@ -71,10 +71,10 @@ public class BordScripts : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="block"></param>
     /// <returns></returns>
-    private bool BlockCheck(int x, int y,BlockScript block)
+    private bool BlockCheck(int x, int y, BlockScript block)
     {
         //二次元配列が空いていない時と親が違うブロックの時
-        return (_grid[x,y] != null && _grid[x,y].parent != block.transform);
+        return (_grid[x, y] != null && _grid[x, y].parent != block.transform);
     }
     /// <summary>
     /// 配列にブロックを格納
@@ -82,10 +82,94 @@ public class BordScripts : MonoBehaviour
     /// <param name="block"></param>
     public void SaveBlockInGrid(BlockScript block)
     {
-        foreach(Transform Item in block.transform)
+        foreach (Transform Item in block.transform)
         {
             Vector2 pos = RoundingScript.Round(Item.position);
             _grid[(int)pos.x, (int)pos.y] = Item;
         }
+    }
+    /// <summary>
+    /// 揃った列を判定して消す
+    /// </summary>
+    public void ClearAllRows()
+    {
+        for (int y = 0; y < _height; y++)
+        {
+            if (IsComplete(y))
+            {
+                ClearRow(y);
+
+                ShitRowsDown(y + 1);
+
+                y--;
+            }
+
+        }
+    }
+    /// <summary>
+    /// 揃った列があるかどうか
+    /// </summary>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private bool IsComplete(int y)
+    {
+        for (int x = 0; x < _width; x++)
+        {
+            if (_grid[x, y] == null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    /// <summary>
+    /// 揃った列を消す
+    /// </summary>
+    /// <param name="y"></param>
+    private void ClearRow(int y)
+    {
+        for (int x = 0; x < _width; x++)
+        {
+            if (_grid[x, y]! == null)
+            {
+                Destroy(_grid[x, y].gameObject);
+            }
+            _grid[x, y] = null;
+        }
+    }
+    /// <summary>
+    /// 列が消えたら一段下げる
+    /// </summary>
+    /// <param name="y"></param>
+    private void ShitRowsDown(int startY)
+    {
+        for (int y = startY; y < _height; y++)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                if (_grid[x, y] != null)
+                {
+                    _grid[x, y - 1] = _grid[x, y];
+                    _grid[x, y] = null;
+                    _grid[x, y - 1].position += new Vector3(0, -1, 0);
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// ゲームオーバーしているかどうか
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
+    public bool OverLimit(BlockScript block)
+    {
+        foreach (Transform T in block.transform)
+        {
+            if (T.transform.position.y >= _height - _header)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

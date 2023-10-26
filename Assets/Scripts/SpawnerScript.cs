@@ -13,6 +13,7 @@ public class SpawnerScript : MonoBehaviour
     private BlockScript GetRandomBlock()
     {
         int i = Random.RandomRange(0, _blocks.Length);
+        //i = 0;
         if (_blocks[i])
         {
             return _blocks[i];

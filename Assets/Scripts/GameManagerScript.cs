@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManagerScript : MonoBehaviour
 {
@@ -21,6 +22,9 @@ public class GameManagerScript : MonoBehaviour
     private float _nextKeySideTimeInterval = default;
     [SerializeField, Header("回転入力のインターバル")]
     private float _nextKeyRotateTimeInterval = default;
+    [SerializeField]
+    private GameObject _gameOverPanel = default;
+    private bool isGameOver = false;
     private void Start()
     {
         //スポナーオブジェクトを格納
@@ -38,30 +42,19 @@ public class GameManagerScript : MonoBehaviour
         {
             _activeBlock = _spawner.SpwnBlock();
         }
+        //アクティブ状態だと消す
+        if (_gameOverPanel.activeInHierarchy)
+        {
+            _gameOverPanel.SetActive(false);
+        }
     }
     private void Update()
     {
-        PlayerInput();
-        if (Time.time > _nextDropTimer)
+        if (isGameOver)
         {
-            _nextDropTimer = Time.time + _dropInterval;
-            if (_activeBlock)
-            {
-                //下に動かす
-                _activeBlock.MoveDown();
-
-                //枠からはみ出していないか
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    //上に戻す
-                    _activeBlock.MoveUp();
-                    //配列に格納
-                    _bord.SaveBlockInGrid(_activeBlock);
-                    //ブロック生成
-                    _activeBlock = _spawner.SpwnBlock();
-                }
-            }
+            return;
         }
+        PlayerInput();
     }
     private void PlayerInput()
     {
@@ -76,7 +69,7 @@ public class GameManagerScript : MonoBehaviour
                 _activeBlock.MoveLeft();
             }
         }
-        else if(Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
+        else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
         {
             //左に動かす
             _activeBlock.MoveLeft();
@@ -87,7 +80,7 @@ public class GameManagerScript : MonoBehaviour
                 _activeBlock.MoveRight();
             }
         }
-        else if(Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
+        else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
         {
             //右回転
             _activeBlock.RotateRight();
@@ -109,19 +102,62 @@ public class GameManagerScript : MonoBehaviour
                 _activeBlock.RotateRight();
             }
         }
-        //else if (Input.GetKey(KeyCode.S) && (Time.time > _nextKeyDownTime)/* || Time.time > _nextKeyDownTime*/)
-        //{
-        //    //下に動かす
-        //    _activeBlock.MoveDown();
+        else if (Input.GetKey(KeyCode.S) && (Time.time > _nextKeyDownTime) || Time.time > _nextDropTimer)
+        {
+            //下に動かす
+            _activeBlock.MoveDown();
 
-        //    _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
-        //    _nextDropTimer = Time.time + _dropInterval;
-            
-        //    //はみ出してたら戻す
-        //    if (!_bord.CheckPosition(_activeBlock))
-        //    {
-                
-        //    }
-        //}
+            _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
+            _nextDropTimer = Time.time + _dropInterval;
+
+            //はみ出してたら戻す
+            if (!_bord.CheckPosition(_activeBlock))
+            {
+
+                if (_bord.OverLimit(_activeBlock))
+                {
+                    GameOver();
+                }
+                else
+                {
+                    //底についた処理
+                    BottomBoard();
+                }
+            }
+        }
+    }
+    /// <summary>
+    /// 底に着いた時の処理4
+    /// </summary>
+    private void BottomBoard()
+    {
+        _activeBlock.MoveUp();
+        _bord.SaveBlockInGrid(_activeBlock);
+
+        _activeBlock = _spawner.SpwnBlock();
+
+        _nextDropTimer = Time.time;
+        _nextKeySideTime = Time.time;
+        _nextKeyRotateTime = Time.time;
+
+        _bord.ClearAllRows();//揃っていれば削除
+    }
+    /// <summary>
+    /// ゲームオーバーの時呼び出す
+    /// </summary>
+    private void GameOver()
+    {
+        _activeBlock.MoveUp();
+        //表示する
+        if (!_gameOverPanel.activeInHierarchy)
+        {
+            _gameOverPanel.SetActive(true);
+        }
+
+        isGameOver = true;
+    }
+    public void Restart()
+    {
+        SceneManager.LoadScene(1);
     }
 }
