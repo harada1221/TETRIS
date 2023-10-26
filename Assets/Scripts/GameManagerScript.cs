@@ -136,6 +136,7 @@ public class GameManagerScript : MonoBehaviour
 
         _activeBlock = _spawner.SpwnBlock();
 
+        //タイムの初期化
         _nextDropTimer = Time.time;
         _nextKeySideTime = Time.time;
         _nextKeyRotateTime = Time.time;
@@ -156,6 +157,9 @@ public class GameManagerScript : MonoBehaviour
 
         isGameOver = true;
     }
+    /// <summary>
+    /// シーンを呼び出す
+    /// </summary>
     public void Restart()
     {
         SceneManager.LoadScene(1);

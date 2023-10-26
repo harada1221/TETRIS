@@ -140,7 +140,6 @@ public class GameControllerScript : MonoBehaviour
                 {
                     if (blockStat[y + j + 1, x + i] == 1 || blockStat[y + j, x + i + 1] == 3)
                     {
-                        Debug.Log("‚µ‚½");
                         isdown = true;
                         break;
                     }
