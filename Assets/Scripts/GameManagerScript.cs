@@ -42,6 +42,8 @@ public class GameManagerScript : MonoBehaviour
         {
             _activeBlock = _spawner.SpwnBlock();
         }
+        //ネクストの表示
+        _spawner.LookBlock();
         //アクティブ状態だと消す
         if (_gameOverPanel.activeInHierarchy)
         {
@@ -133,6 +135,7 @@ public class GameManagerScript : MonoBehaviour
     {
         _activeBlock.MoveUp();
         _bord.SaveBlockInGrid(_activeBlock);
+        _spawner.LookBlock();
 
         _activeBlock = _spawner.SpwnBlock();
 

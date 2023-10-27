@@ -97,10 +97,10 @@ public class BordScripts : MonoBehaviour
         {
             if (IsComplete(y))
             {
-                //ClearRow(y);
+                ClearRow(y);
 
                 ShitRowsDown(y + 1);
-                ClearRow(y);
+            
                 y--;
             }
 
@@ -130,13 +130,9 @@ public class BordScripts : MonoBehaviour
     {
         for (int x = 0; x < _width; x++)
         {
-            Debug.Log(x + "XXX");
-            Debug.Log(y + "YYY");
-            Debug.Log(_grid[x, y]);
-            if (_grid[x, y]! == null)
+            if (_grid[x, y] != null)
             {
-                Debug.Log("‰½‚à‚È‚¢‚æ");
-
+              
                 Destroy(_grid[x, y].gameObject);
 
             }
