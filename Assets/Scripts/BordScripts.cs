@@ -57,8 +57,6 @@ public class BordScripts : MonoBehaviour
     /// <summary>
     /// ògì‡Ç…Ç†ÇÈÇ©Ç«Ç§Ç©îªíËÇ∑ÇÈä÷êî
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
     /// <returns></returns>
     private bool BoardOutCheck(int x, int y)
     {
@@ -132,9 +130,7 @@ public class BordScripts : MonoBehaviour
         {
             if (_grid[x, y] != null)
             {
-              
                 Destroy(_grid[x, y].gameObject);
-
             }
             _grid[x, y] = null;
         }

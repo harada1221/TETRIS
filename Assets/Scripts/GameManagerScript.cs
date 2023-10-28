@@ -7,6 +7,7 @@ public class GameManagerScript : MonoBehaviour
 {
     private SpawnerScript _spawner = default;//ブロックスポナー
     private BlockScript _activeBlock = default;//生成されたブロック格納
+    private BlockScript _ghostBlock = default;//生成されたゴーストブロック
     private BlockScript _holdBlock = default;//ホールドしたブロックを格納
     private BlockScript _saveBlock = default;//ホールドしたブロックを入れ替える用
     [SerializeField, Header("ブロックが落ちる時間")]
@@ -31,6 +32,7 @@ public class GameManagerScript : MonoBehaviour
     private GameObject _gameOverPanel = default;
     private bool isGameOver = false;
     private bool isChangeBlock = false;
+
     private void Start()
     {
         //スポナーオブジェクトを格納
@@ -48,6 +50,13 @@ public class GameManagerScript : MonoBehaviour
         if (!_activeBlock)
         {
             _activeBlock = _spawner.SpwnBlock();
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            while (_bord.CheckPosition(_ghostBlock))
+            {
+                //下に動かす
+                _ghostBlock.MoveDown();
+            }
+            _ghostBlock.MoveUp();
         }
         //アクティブ状態だと消す
         if (_gameOverPanel.activeInHierarchy)
@@ -57,10 +66,12 @@ public class GameManagerScript : MonoBehaviour
     }
     private void Update()
     {
+
         if (isGameOver)
         {
             return;
         }
+        DownGhostBlock();
         PlayerInput();
     }
     private void PlayerInput()
@@ -70,11 +81,13 @@ public class GameManagerScript : MonoBehaviour
             _lookTime = Time.time + _lookTimeInterval;
             //右に動かす
             _activeBlock.MoveRight();
+            _ghostBlock.MoveRight();
             _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
             //はみ出してたら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
                 _activeBlock.MoveLeft();
+                _ghostBlock.MoveLeft();
             }
         }
         else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
@@ -82,11 +95,13 @@ public class GameManagerScript : MonoBehaviour
             _lookTime = Time.time + _lookTimeInterval;
             //左に動かす
             _activeBlock.MoveLeft();
+            _ghostBlock.MoveLeft();
             _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
             //はみ出してたら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
                 _activeBlock.MoveRight();
+                _ghostBlock.MoveRight();
             }
         }
         else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
@@ -94,11 +109,13 @@ public class GameManagerScript : MonoBehaviour
             _lookTime = Time.time + _lookTimeInterval;
             //右回転
             _activeBlock.RotateRight();
+            _ghostBlock.RotateRight();
             _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
             //はみ出たら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
                 _activeBlock.RotateLeft();
+                _ghostBlock.RotateLeft();
             }
         }
         else if (Input.GetKey(KeyCode.Q) && (Time.time > _nextKeyRotateTime))
@@ -106,11 +123,13 @@ public class GameManagerScript : MonoBehaviour
             _lookTime = Time.time + _lookTimeInterval;
             //右回転
             _activeBlock.RotateLeft();
+            _ghostBlock.RotateLeft();
             _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
             //はみ出たら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
                 _activeBlock.RotateRight();
+                _ghostBlock.RotateRight();
             }
         }
         else if (Input.GetKey(KeyCode.S) && (Time.time > _nextKeyDownTime) || Time.time > _nextDropTimer)
@@ -131,11 +150,23 @@ public class GameManagerScript : MonoBehaviour
                 }
                 else
                 {
-
                     //底についた処理
                     BottomBoard();
                 }
             }
+        }
+        //ハードドロップ
+        else if (Input.GetKeyDown(KeyCode.W))
+        {
+            //ぶつかるまで繰り返す
+            while (_bord.CheckPosition(_activeBlock))
+            {
+                //下に動かす
+                _activeBlock.MoveDown();
+            }
+
+            BottomBoard();
+
         }
         //ホールドの処理
         else if (Input.GetKeyDown(KeyCode.Z) && isChangeBlock == false)
@@ -146,7 +177,10 @@ public class GameManagerScript : MonoBehaviour
                 //1回目の処理
                 _holdBlock = Instantiate(_activeBlock, new Vector3(-6, 15, 0), Quaternion.identity);
                 Destroy(_activeBlock.gameObject);
+                Destroy(_ghostBlock.gameObject);
                 _activeBlock = _spawner.SpwnBlock();
+                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+
                 //タイムの初期化
                 _nextDropTimer = Time.time;
                 _nextKeySideTime = Time.time;
@@ -159,10 +193,12 @@ public class GameManagerScript : MonoBehaviour
                 _saveBlock = _activeBlock;
                 _activeBlock = _holdBlock;
                 _holdBlock = _saveBlock;
-               
+
                 Destroy(_saveBlock.gameObject);
                 Destroy(_activeBlock.gameObject);
+                Destroy(_ghostBlock.gameObject);
                 _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
+                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
 
                 Destroy(_holdBlock.gameObject);
 
@@ -181,16 +217,14 @@ public class GameManagerScript : MonoBehaviour
     private void BottomBoard()
     {
         _activeBlock.MoveUp();
-        Debug.Log(_lookTime);
-        Debug.Log(Time.time+"TTTT");
-        if (Time.time > _lookTime)
+        if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.W))
         {
-            Debug.Log("日あった");
-           
             _bord.SaveBlockInGrid(_activeBlock);
 
             isChangeBlock = false;
+            Destroy(_ghostBlock.gameObject);
             _activeBlock = _spawner.SpwnBlock();
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
 
             //タイムの初期化
             _nextDropTimer = Time.time;
@@ -220,5 +254,25 @@ public class GameManagerScript : MonoBehaviour
     public void Restart()
     {
         SceneManager.LoadScene(1);
+    }
+    private void DownGhostBlock()
+    {
+        _ghostBlock.transform.position = _activeBlock.transform.position;
+        while (_bord.CheckPosition(_ghostBlock))
+        {
+            //下に動かす
+            _ghostBlock.MoveDown();
+        }
+        _ghostBlock.MoveUp();
+    }
+    private void ColorChange()
+    {
+        Transform parentTransform = _ghostBlock.transform;
+
+        // 子オブジェクトを全て取得する
+        foreach (Transform child in parentTransform)
+        {
+         
+        }
     }
 }
