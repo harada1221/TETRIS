@@ -55,6 +55,10 @@ public class SpawnerScript : MonoBehaviour
             return null;
         }
     }
+    /// <summary>
+    /// ネクストのブロックを表示
+    /// </summary>
+    /// <returns></returns>
     private BlockScript[] LookBlock()
     {
         for (int j = 0; j < _saveBloocks.Length; j++)

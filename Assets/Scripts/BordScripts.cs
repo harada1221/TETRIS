@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BordScripts : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class BordScripts : MonoBehaviour
     private Transform _emptySprite = default;
     [SerializeField, Header("マップの広さ")]
     private int _height = 30, _width = 10, _header = 8;
+    private int _score = default;//スコアの数値
+
+    [SerializeField, Header("スコアのテキスト")]
+    private Text _scoreText = default;
 
     private Transform[,] _grid = default;
 
@@ -98,7 +103,7 @@ public class BordScripts : MonoBehaviour
                 ClearRow(y);
 
                 ShitRowsDown(y + 1);
-            
+
                 y--;
             }
 
@@ -163,7 +168,7 @@ public class BordScripts : MonoBehaviour
     {
         foreach (Transform T in block.transform)
         {
-            if (T.transform.position.y >= _height - _header)
+            if (T.transform.position.y >= _height - _header - 1)
             {
                 return true;
             }

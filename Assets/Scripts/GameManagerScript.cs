@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class GameManagerScript : MonoBehaviour
 {
+    [SerializeField,Header("ゴーストブロックの色")]
+    private Color _colorWhite = default;
+
     private SpawnerScript _spawner = default;//ブロックスポナー
     private BlockScript _activeBlock = default;//生成されたブロック格納
     private BlockScript _ghostBlock = default;//生成されたゴーストブロック
@@ -14,11 +17,14 @@ public class GameManagerScript : MonoBehaviour
     private float _dropInterval = 0.25f;
     private float _nextDropTimer = default;//次にブロックが落ちるまでの時間
 
-    private BordScripts _bord = default;
+    private BordScripts _bord = default;//フィールドのスクリプト
     private float _nextKeyDownTime = default;
     private float _nextKeySideTime = default;
     private float _nextKeyRotateTime = default;
     private float _lookTime = default;
+
+    [SerializeField, Header("ブロックを動かした回数")]
+    private int _moveCount = 15;
 
     [SerializeField, Header("下入力のインターバル")]
     private float _nextKeyDownTimeInterval = default;
@@ -30,8 +36,9 @@ public class GameManagerScript : MonoBehaviour
     private float _lookTimeInterval = default;
     [SerializeField]
     private GameObject _gameOverPanel = default;
-    private bool isGameOver = false;
-    private bool isChangeBlock = false;
+    private bool isGameOver = false;//ゲームオーバーの判定
+    private bool isChangeBlock = false;//ホールドそをしたか
+    private bool isGround = false;
 
     private void Start()
     {
@@ -51,6 +58,7 @@ public class GameManagerScript : MonoBehaviour
         {
             _activeBlock = _spawner.SpwnBlock();
             _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            ColorChange();
             while (_bord.CheckPosition(_ghostBlock))
             {
                 //下に動かす
@@ -78,6 +86,7 @@ public class GameManagerScript : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.D) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.D))
         {
+            _moveCount++;
             _lookTime = Time.time + _lookTimeInterval;
             //右に動かす
             _activeBlock.MoveRight();
@@ -92,6 +101,7 @@ public class GameManagerScript : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
         {
+            _moveCount++;
             _lookTime = Time.time + _lookTimeInterval;
             //左に動かす
             _activeBlock.MoveLeft();
@@ -106,6 +116,7 @@ public class GameManagerScript : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
         {
+            _moveCount++;
             _lookTime = Time.time + _lookTimeInterval;
             //右回転
             _activeBlock.RotateRight();
@@ -120,6 +131,7 @@ public class GameManagerScript : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.Q) && (Time.time > _nextKeyRotateTime))
         {
+            _moveCount++;
             _lookTime = Time.time + _lookTimeInterval;
             //右回転
             _activeBlock.RotateLeft();
@@ -143,13 +155,18 @@ public class GameManagerScript : MonoBehaviour
             //はみ出してたら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
-
+                //範囲外だとゲームオーバー
                 if (_bord.OverLimit(_activeBlock))
                 {
                     GameOver();
                 }
                 else
                 {
+                    if (!isGround)
+                    {
+                        isGround = true;
+                        _lookTime = Time.time + _lookTimeInterval;
+                    }
                     //底についた処理
                     BottomBoard();
                 }
@@ -180,7 +197,7 @@ public class GameManagerScript : MonoBehaviour
                 Destroy(_ghostBlock.gameObject);
                 _activeBlock = _spawner.SpwnBlock();
                 _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
-
+                ColorChange();
                 //タイムの初期化
                 _nextDropTimer = Time.time;
                 _nextKeySideTime = Time.time;
@@ -194,16 +211,18 @@ public class GameManagerScript : MonoBehaviour
                 _activeBlock = _holdBlock;
                 _holdBlock = _saveBlock;
 
+                //元からブロックを削除してインスタンスする
                 Destroy(_saveBlock.gameObject);
                 Destroy(_activeBlock.gameObject);
                 Destroy(_ghostBlock.gameObject);
                 _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
                 _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
-
+                ColorChange();
                 Destroy(_holdBlock.gameObject);
 
                 _holdBlock = Instantiate(_saveBlock, new Vector3(-6, 15, 0), Quaternion.identity);
 
+                //タイムの初期化
                 _nextDropTimer = Time.time;
                 _nextKeySideTime = Time.time;
                 _nextKeyRotateTime = Time.time;
@@ -217,7 +236,7 @@ public class GameManagerScript : MonoBehaviour
     private void BottomBoard()
     {
         _activeBlock.MoveUp();
-        if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.W))
+        if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.W) || _moveCount >= 15)
         {
             _bord.SaveBlockInGrid(_activeBlock);
 
@@ -225,12 +244,14 @@ public class GameManagerScript : MonoBehaviour
             Destroy(_ghostBlock.gameObject);
             _activeBlock = _spawner.SpwnBlock();
             _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
-
-            //タイムの初期化
+            ColorChange();
+            //値の初期化
             _nextDropTimer = Time.time;
             _nextKeySideTime = Time.time;
             _nextKeyRotateTime = Time.time;
             _lookTime = Time.time;
+            _moveCount = 0;
+            isGround = false;
             _bord.ClearAllRows();//揃っていれば削除
         }
     }
@@ -267,12 +288,14 @@ public class GameManagerScript : MonoBehaviour
     }
     private void ColorChange()
     {
-        Transform parentTransform = _ghostBlock.transform;
+        Transform parent = _ghostBlock.transform;
+        SpriteRenderer chidren;
 
         // 子オブジェクトを全て取得する
-        foreach (Transform child in parentTransform)
+        foreach (Transform child in parent)
         {
-         
+            chidren = child.GetComponent<SpriteRenderer>();
+            chidren.color = _colorWhite;
         }
     }
 }
