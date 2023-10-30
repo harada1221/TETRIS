@@ -5,8 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class GameManagerScript : MonoBehaviour
 {
-    [SerializeField,Header("ゴーストブロックの色")]
+    [SerializeField, Header("ゴーストブロックの色")]
     private Color _colorWhite = default;
+    private Vector3 _ghostBlockPosition = new Vector3(0, 0, 0.5f);
 
     private SpawnerScript _spawner = default;//ブロックスポナー
     private BlockScript _activeBlock = default;//生成されたブロック格納
@@ -57,7 +58,7 @@ public class GameManagerScript : MonoBehaviour
         if (!_activeBlock)
         {
             _activeBlock = _spawner.SpwnBlock();
-            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
             ColorChange();
             while (_bord.CheckPosition(_ghostBlock))
             {
@@ -196,7 +197,7 @@ public class GameManagerScript : MonoBehaviour
                 Destroy(_activeBlock.gameObject);
                 Destroy(_ghostBlock.gameObject);
                 _activeBlock = _spawner.SpwnBlock();
-                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
                 ColorChange();
                 //タイムの初期化
                 _nextDropTimer = Time.time;
@@ -216,7 +217,7 @@ public class GameManagerScript : MonoBehaviour
                 Destroy(_activeBlock.gameObject);
                 Destroy(_ghostBlock.gameObject);
                 _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
-                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
                 ColorChange();
                 Destroy(_holdBlock.gameObject);
 
@@ -243,7 +244,7 @@ public class GameManagerScript : MonoBehaviour
             isChangeBlock = false;
             Destroy(_ghostBlock.gameObject);
             _activeBlock = _spawner.SpwnBlock();
-            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
             ColorChange();
             //値の初期化
             _nextDropTimer = Time.time;
@@ -278,7 +279,7 @@ public class GameManagerScript : MonoBehaviour
     }
     private void DownGhostBlock()
     {
-        _ghostBlock.transform.position = _activeBlock.transform.position;
+        _ghostBlock.transform.position = _activeBlock.transform.position+_ghostBlockPosition;
         while (_bord.CheckPosition(_ghostBlock))
         {
             //下に動かす

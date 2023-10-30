@@ -13,6 +13,8 @@ public class BordScripts : MonoBehaviour
 
     [SerializeField, Header("スコアのテキスト")]
     private Text _scoreText = default;
+    [SerializeReference]
+    private Text _;
 
     private Transform[,] _grid = default;
 
@@ -96,6 +98,7 @@ public class BordScripts : MonoBehaviour
     /// </summary>
     public void ClearAllRows()
     {
+        int LenCount = 0;
         for (int y = 0; y < _height; y++)
         {
             if (IsComplete(y))
@@ -103,10 +106,19 @@ public class BordScripts : MonoBehaviour
                 ClearRow(y);
 
                 ShitRowsDown(y + 1);
+                LenCount++;
 
                 y--;
             }
+        }
 
+        if (LenCount >= 4)
+        {
+            _.text = "TETRIS";
+        }
+        else
+        {
+            _.text = "";
         }
     }
     /// <summary>
@@ -136,6 +148,8 @@ public class BordScripts : MonoBehaviour
             if (_grid[x, y] != null)
             {
                 Destroy(_grid[x, y].gameObject);
+                _score += 10;
+                _scoreText.text = "Score:" + _score.ToString();
             }
             _grid[x, y] = null;
         }
