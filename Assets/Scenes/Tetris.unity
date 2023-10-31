@@ -836,7 +836,7 @@ MonoBehaviour:
   _width: 10
   _header: 8
   _scoreText: {fileID: 580054942}
-  _: {fileID: 2035679597}
+  _deleteType: {fileID: 2035679597}
 --- !u!4 &1173708609
 Transform:
   m_ObjectHideFlags: 0
@@ -1618,7 +1618,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 621, y: 207}
+  m_AnchoredPosition: {x: 538, y: 172}
   m_SizeDelta: {x: 698.0533, y: 152.7597}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2035679597

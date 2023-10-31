@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class BlockScript : MonoBehaviour
 {
-    [SerializeField]
+    [SerializeField,Header("‰ñ“]‚³‚¹‚é‚©")]
     private bool isRotate = true;
 
+    [SerializeField, Header("TƒXƒsƒ“”»’è")]
+    private bool isTSpin = true;
+
+    public bool GetTspin { get => isTSpin; }
     /// <summary>
     /// ˆÚ“®‚³‚¹‚é
     /// </summary>

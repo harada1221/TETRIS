@@ -11,13 +11,16 @@ public class BordScripts : MonoBehaviour
     private int _height = 30, _width = 10, _header = 8;
     private int _score = default;//スコアの数値
 
+    private bool isTSpin = default;
+
     [SerializeField, Header("スコアのテキスト")]
     private Text _scoreText = default;
-    [SerializeReference]
-    private Text _;
+    [SerializeReference, Header("消し方の種類")]
+    private Text _deleteType;
 
     private Transform[,] _grid = default;
 
+    public int GetScoreType { get => _score; }
     private void Awake()
     {
         _grid = new Transform[_width, _height];
@@ -87,10 +90,49 @@ public class BordScripts : MonoBehaviour
     /// <param name="block"></param>
     public void SaveBlockInGrid(BlockScript block)
     {
+        isTSpin = false;
+        Vector2 pos = new Vector2(0, 0);
         foreach (Transform Item in block.transform)
         {
-            Vector2 pos = RoundingScript.Round(Item.position);
+            pos = RoundingScript.Round(Item.position);
             _grid[(int)pos.x, (int)pos.y] = Item;
+        }
+        if (block.GetTspin == true)
+        {
+            int Count = 0;
+            pos = block.transform.position;
+            if (BoardOutCheck((int)pos.x + 1, (int)pos.y + 1))
+            {
+                if (_grid[(int)pos.x + 1, (int)pos.y + 1] != null)
+                {
+                    Count++;
+                }
+            }
+            if (BoardOutCheck((int)pos.x + 1, (int)pos.y - 1))
+            {
+                if (_grid[(int)pos.x + 1, (int)pos.y - 1] != null)
+                {
+                    Count++;
+                }
+            }
+            if (BoardOutCheck((int)pos.x - 1, (int)pos.y + 1))
+            {
+                if (_grid[(int)pos.x - 1, (int)pos.y + 1] != null)
+                {
+                    Count++;
+                }
+            }
+            if (BoardOutCheck((int)pos.x - 1, (int)pos.y - 1))
+            {
+                if (_grid[(int)pos.x - 1, (int)pos.y - 1] != null)
+                {
+                    Count++;
+                }
+            }
+            if (Count >= 3)
+            {
+                isTSpin = true;
+            }
         }
     }
     /// <summary>
@@ -98,7 +140,8 @@ public class BordScripts : MonoBehaviour
     /// </summary>
     public void ClearAllRows()
     {
-        int LenCount = 0;
+        int DeleteCount = 0;
+
         for (int y = 0; y < _height; y++)
         {
             if (IsComplete(y))
@@ -106,19 +149,37 @@ public class BordScripts : MonoBehaviour
                 ClearRow(y);
 
                 ShitRowsDown(y + 1);
-                LenCount++;
-
+                DeleteCount++;
                 y--;
             }
         }
-
-        if (LenCount >= 4)
+        if (isTSpin)
         {
-            _.text = "TETRIS";
+            switch (DeleteCount)
+            {
+                case 1:
+                    _deleteType.text = "T-Spin Single";
+                    _score += 1000;
+                    break;
+                case 2:
+                    _deleteType.text = "T-Spin Double";
+                    _score += 2000;
+                    break;
+                case 3:
+                    _deleteType.text = "T-Spin Triple";
+                    _score += 3000;
+                    break;
+            }
+        }
+        else if (DeleteCount >= 4)
+        {
+            _deleteType.text = "TETRIS";
+            _score += 1000;
+            _scoreText.text = "Score:" + _score.ToString();
         }
         else
         {
-            _.text = "";
+            _deleteType.text = "";
         }
     }
     /// <summary>

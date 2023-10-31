@@ -80,6 +80,7 @@ public class GameManagerScript : MonoBehaviour
         {
             return;
         }
+
         DownGhostBlock();
         PlayerInput();
     }
@@ -239,9 +240,11 @@ public class GameManagerScript : MonoBehaviour
         _activeBlock.MoveUp();
         if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.W) || _moveCount >= 15)
         {
+            //配列に格納
             _bord.SaveBlockInGrid(_activeBlock);
-
+            //ホールドをできるように
             isChangeBlock = false;
+            //ブロックを消して次のブロックを生成
             Destroy(_ghostBlock.gameObject);
             _activeBlock = _spawner.SpwnBlock();
             _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
@@ -254,6 +257,8 @@ public class GameManagerScript : MonoBehaviour
             _moveCount = 0;
             isGround = false;
             _bord.ClearAllRows();//揃っていれば削除
+
+           
         }
     }
     /// <summary>
@@ -275,11 +280,11 @@ public class GameManagerScript : MonoBehaviour
     /// </summary>
     public void Restart()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(0);
     }
     private void DownGhostBlock()
     {
-        _ghostBlock.transform.position = _activeBlock.transform.position+_ghostBlockPosition;
+        _ghostBlock.transform.position = _activeBlock.transform.position + _ghostBlockPosition;
         while (_bord.CheckPosition(_ghostBlock))
         {
             //下に動かす
