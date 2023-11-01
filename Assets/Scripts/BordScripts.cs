@@ -20,6 +20,8 @@ public class BordScripts : MonoBehaviour
 
     private Transform[,] _grid = default;
 
+    private int _tspinCount = default;
+
     public int GetScoreType { get => _score; }
     private void Awake()
     {
@@ -75,9 +77,6 @@ public class BordScripts : MonoBehaviour
     /// <summary>
     /// à⁄ìÆêÊÇ…ÉuÉçÉbÉNÇ™Ç†ÇÈÇ©Ç«Ç§Ç©
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="block"></param>
     /// <returns></returns>
     private bool BlockCheck(int x, int y, BlockScript block)
     {
@@ -249,5 +248,21 @@ public class BordScripts : MonoBehaviour
             }
         }
         return false;
+    }
+    public void Tspin(BlockScript block)
+    {
+        if (block.GetTspin == false) return;
+
+        Transform transform = block.transform;
+        Vector2 pos = RoundingScript.Round(transform.position);
+        if (!CheckPosition(block))
+        {
+            transform.position += new Vector3(0, 1, 0);
+            block.RotateLeft();
+        }
+        else if (CheckPosition(block))
+        {
+
+        }
     }
 }
