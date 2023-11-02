@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class BlockScript : MonoBehaviour
 {
-    [SerializeField,Header("回転させるか")]
+    [SerializeField, Header("回転させるか")]
     private bool isRotate = true;
 
-    [SerializeField, Header("Tスピン判定")]
-    private bool isTSpin = true;
+    [SerializeField, Header("スーパーローテーション判定")]
+    private bool isSuperRotatiion = true;
 
+    [SerializeField, Header("Tスピン判定")]
+    private bool isTSpin = default;
+
+    [SerializeField, Header("Iミノ")]
+    private bool isISpin = default;
+    public bool GetSuperspin { get => isSuperRotatiion; }
     public bool GetTspin { get => isTSpin; }
+    public bool GetISpin { get => isISpin; }
     /// <summary>
     /// 移動させる
     /// </summary>
@@ -23,7 +30,7 @@ public class BlockScript : MonoBehaviour
     {
         Move(new Vector3(-1, 0, 0));
     }
-     public void MoveRight()
+    public void MoveRight()
     {
         Move(new Vector3(1, 0, 0));
     }

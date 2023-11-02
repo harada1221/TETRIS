@@ -301,7 +301,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRotate: 1
-  isTSpin: 1
+  isSuperRotatiion: 1
+  isTSpin: 0
 --- !u!1 &8527124326836376565
 GameObject:
   m_ObjectHideFlags: 0

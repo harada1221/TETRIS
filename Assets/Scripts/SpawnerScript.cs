@@ -44,6 +44,10 @@ public class SpawnerScript : MonoBehaviour
     public BlockScript SpwnBlock()
     {
         BlockScript block = Instantiate(GetRandomBlock(), transform.position, Quaternion.identity);
+        if (block.GetISpin)
+        {
+            block.transform.position += new Vector3(0.5f, 0.5f, 0);
+        }
         LookBlock();
 
         if (block)

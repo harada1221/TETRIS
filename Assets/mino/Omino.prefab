@@ -385,4 +385,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRotate: 0
-  isTSpin: 0
+  isSuperRotatiion: 0

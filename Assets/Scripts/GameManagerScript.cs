@@ -75,24 +75,29 @@ public class GameManagerScript : MonoBehaviour
     }
     private void Update()
     {
-
+        //ゲームオーバーだったら動かさない
         if (isGameOver)
         {
             return;
         }
-
+        //ゴーストブロックを下まで落とす
         DownGhostBlock();
+        //プレイヤーの操作
         PlayerInput();
     }
     private void PlayerInput()
     {
+        //右に移動
         if (Input.GetKey(KeyCode.D) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.D))
         {
+            //動かせる回数をカウントアップ
             _moveCount++;
+            //着地から固定までの時間
             _lookTime = Time.time + _lookTimeInterval;
             //右に動かす
             _activeBlock.MoveRight();
             _ghostBlock.MoveRight();
+            //タイマーリセット
             _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
             //はみ出してたら戻す
             if (!_bord.CheckPosition(_activeBlock))
@@ -101,9 +106,12 @@ public class GameManagerScript : MonoBehaviour
                 _ghostBlock.MoveLeft();
             }
         }
+        //左に移動
         else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
         {
+            //動かせる回数をカウントアップ
             _moveCount++;
+            //着地から固定までの時間
             _lookTime = Time.time + _lookTimeInterval;
             //左に動かす
             _activeBlock.MoveLeft();
@@ -116,9 +124,12 @@ public class GameManagerScript : MonoBehaviour
                 _ghostBlock.MoveRight();
             }
         }
+        //右回転
         else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
         {
+            //動かせる回数をカウントアップ
             _moveCount++;
+            //着地から固定までの時間
             _lookTime = Time.time + _lookTimeInterval;
             //右回転
             _activeBlock.RotateRight();
@@ -127,23 +138,23 @@ public class GameManagerScript : MonoBehaviour
             //はみ出たら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
-                if (_activeBlock.GetTspin)
+                //回転補正OとI以外
+                if (_activeBlock.GetSuperspin)
                 {
-                    Debug.Log(_activeBlock.transform.localEulerAngles.z);
                     TRotationRight();
                 }
-                else
+                if (_activeBlock.GetISpin)
                 {
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
+                    IRotationRight();
                 }
-               
             }
         }
+        //左回転
         else if (Input.GetKey(KeyCode.Q) && (Time.time > _nextKeyRotateTime))
         {
             //着地してから動ける回数
             _moveCount++;
+            //着地から固定までの時間
             _lookTime = Time.time + _lookTimeInterval;
             //左回転
             _activeBlock.RotateLeft();
@@ -152,17 +163,17 @@ public class GameManagerScript : MonoBehaviour
             //はみ出たら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
-                if (_activeBlock.GetTspin)
+                if (_activeBlock.GetSuperspin)
                 {
                     TRotationLeft();
                 }
-                else
+                if (_activeBlock.GetISpin)
                 {
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
+                    IRotationLeft();
                 }
             }
         }
+        //ソフトドロップ
         else if (Input.GetKey(KeyCode.S) && (Time.time > _nextKeyDownTime) || Time.time > _nextDropTimer)
         {
             //下に動かす
@@ -207,15 +218,19 @@ public class GameManagerScript : MonoBehaviour
         //ホールドの処理
         else if (Input.GetKeyDown(KeyCode.Z) && isChangeBlock == false)
         {
+            //ホールドを１度だけにする
             isChangeBlock = true;
             if (_holdBlock == default)
             {
                 //1回目の処理
                 _holdBlock = Instantiate(_activeBlock, new Vector3(-6, 15, 0), Quaternion.identity);
+                //ブロック削除
                 Destroy(_activeBlock.gameObject);
                 Destroy(_ghostBlock.gameObject);
+                //ブロック生成
                 _activeBlock = _spawner.SpwnBlock();
                 _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
+                //色を変える
                 ColorChange();
                 //タイムの初期化
                 _nextDropTimer = Time.time;
@@ -230,15 +245,23 @@ public class GameManagerScript : MonoBehaviour
                 _activeBlock = _holdBlock;
                 _holdBlock = _saveBlock;
 
-                //元からブロックを削除してインスタンスする
+                //元のブロックを削除
                 Destroy(_saveBlock.gameObject);
                 Destroy(_activeBlock.gameObject);
                 Destroy(_ghostBlock.gameObject);
+                //新しくブロックを生成
                 _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
+                //Iミノだったら位置調整
+                if (_activeBlock.GetISpin)
+                {
+                    _activeBlock.transform.position += new Vector3(0.5f, 0.5f, 0);
+                }
                 _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
+                //色を変える
                 ColorChange();
+                //ホールドブロックを削除
                 Destroy(_holdBlock.gameObject);
-
+                //表示ようホールドブロック生成
                 _holdBlock = Instantiate(_saveBlock, new Vector3(-6, 15, 0), Quaternion.identity);
 
                 //タイムの初期化
@@ -332,7 +355,7 @@ public class GameManagerScript : MonoBehaviour
     /// </summary>
     private void TRotationLeft()
     {
-        switch (_activeBlock.transform.localEulerAngles.z)
+        switch (_activeBlock.transform.rotation.eulerAngles.z)
         {
             case 0:
 
@@ -350,6 +373,12 @@ public class GameManagerScript : MonoBehaviour
                 {
                     _activeBlock.transform.position += new Vector3(1, 0, 0);
                 }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, -2, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
                 break;
             case 90:
                 _activeBlock.transform.position += new Vector3(1, 0, 0);
@@ -364,73 +393,13 @@ public class GameManagerScript : MonoBehaviour
                 }
                 if ((!_bord.CheckPosition(_activeBlock)))
                 {
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                }
-                break;
-            case -90:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                }
-                break;
-            case 180:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                }
-                break;
-        }
-    }
-    private void TRotationRight()
-    {
-        switch (_activeBlock.transform.localEulerAngles.z)
-        {
-            case 0:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                }
-                break;
-            case 90:
-                _activeBlock.transform.position += new Vector3(1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
                     _activeBlock.transform.position += new Vector3(1, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, 2, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
                 }
                 break;
             case 270:
@@ -447,6 +416,105 @@ public class GameManagerScript : MonoBehaviour
                 {
                     _activeBlock.transform.position += new Vector3(-1, 0, 0);
                 }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, 2, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
+                break;
+            case 180:
+                _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, -1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, -2, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
+                break;
+        }
+    }
+    /// <summary>
+    /// 右回転の回転補正
+    /// </summary>
+    private void TRotationRight()
+    {
+        switch (_activeBlock.transform.rotation.eulerAngles.z)
+        {
+            case 0:
+                _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, -1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, -2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
+                break;
+            case 90:
+                _activeBlock.transform.position += new Vector3(1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, 1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, -3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, 2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
+                break;
+            case 270:
+                _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, 1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, -3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, 2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
                 break;
             case 180:
                 _activeBlock.transform.position += new Vector3(1, 0, 0);
@@ -461,6 +529,200 @@ public class GameManagerScript : MonoBehaviour
                 if (!_bord.CheckPosition(_activeBlock))
                 {
                     _activeBlock.transform.position += new Vector3(1, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, -2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
+                break;
+        }
+
+    }
+    /// <summary>
+    /// Iミノブロックの左回転補正
+    /// </summary>
+    private void IRotationLeft()
+    {
+        switch (_activeBlock.transform.rotation.eulerAngles.z)
+        {
+            case 0:
+                _activeBlock.transform.position += new Vector3(2, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, -3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(1, 2, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
+                break;
+            case 90:
+                _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 2, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, -3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-2, 1, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
+                break;
+            case 180:
+                _activeBlock.transform.position += new Vector3(1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, -1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-1, -2, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
+                break;
+            case 270:
+                _activeBlock.transform.position += new Vector3(1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, -1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(2, -1, 0);
+                    _activeBlock.RotateRight();
+                    _ghostBlock.RotateRight();
+                }
+                break;
+        }
+    }
+    /// <summary>
+    /// Iミノブロックの右回転補正
+    /// </summary>
+    private void IRotationRight()
+    {
+        switch (_activeBlock.transform.rotation.eulerAngles.z)
+        {
+            case 0:
+                _activeBlock.transform.position += new Vector3(-2, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, -2, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(2, -2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
+                break;
+
+            case 90:
+                _activeBlock.transform.position += new Vector3(2, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(0, 1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(2, 2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
+                break;
+            case 180:
+                _activeBlock.transform.position += new Vector3(-1, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 2, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, -3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(2, 2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
+                }
+                break;
+            case 270:
+                _activeBlock.transform.position += new Vector3(-2, 0, 0);
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 0, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-3, -1, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(3, 3, 0);
+                }
+                if (!_bord.CheckPosition(_activeBlock))
+                {
+                    _activeBlock.transform.position += new Vector3(-2, -2, 0);
+                    _activeBlock.RotateLeft();
+                    _ghostBlock.RotateLeft();
                 }
                 break;
         }

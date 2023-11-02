@@ -11,6 +11,7 @@ public class BordScripts : MonoBehaviour
     private int _height = 30, _width = 10, _header = 8;
     private int _score = default;//スコアの数値
 
+    //Tミノブロックであるか
     private bool isTSpin = default;
 
     [SerializeField, Header("スコアのテキスト")]
@@ -19,10 +20,6 @@ public class BordScripts : MonoBehaviour
     private Text _deleteType;
 
     private Transform[,] _grid = default;
-
-    private int _tspinCount = default;
-
-    public int GetScoreType { get => _score; }
     private void Awake()
     {
         _grid = new Transform[_width, _height];
@@ -96,6 +93,7 @@ public class BordScripts : MonoBehaviour
             pos = RoundingScript.Round(Item.position);
             _grid[(int)pos.x, (int)pos.y] = Item;
         }
+        //Tスピンかどうか置いた場所の周りを確認
         if (block.GetTspin == true)
         {
             int Count = 0;
@@ -248,21 +246,5 @@ public class BordScripts : MonoBehaviour
             }
         }
         return false;
-    }
-    public void Tspin(BlockScript block)
-    {
-        if (block.GetTspin == false) return;
-
-        Transform transform = block.transform;
-        Vector2 pos = RoundingScript.Round(transform.position);
-        if (!CheckPosition(block))
-        {
-            transform.position += new Vector3(0, 1, 0);
-            block.RotateLeft();
-        }
-        else if (CheckPosition(block))
-        {
-
-        }
     }
 }
