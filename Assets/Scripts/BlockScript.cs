@@ -26,24 +26,36 @@ public class BlockScript : MonoBehaviour
     {
         transform.position += moveDirection;
     }
+    /// <summary>
+    /// 左移動
+    /// </summary>
     public void MoveLeft()
     {
         Move(new Vector3(-1, 0, 0));
     }
+    /// <summary>
+    /// 右移動
+    /// </summary>
     public void MoveRight()
     {
         Move(new Vector3(1, 0, 0));
     }
+    /// <summary>
+    /// 上移動
+    /// </summary>
     public void MoveUp()
     {
         Move(new Vector3(0, 1, 0));
     }
+    /// <summary>
+    /// 下移動
+    /// </summary>
     public void MoveDown()
     {
         Move(new Vector3(0, -1, 0));
     }
     /// <summary>
-    /// ブロックを回転させる
+    /// ブロックを右回転させる
     /// </summary>
     public void RotateRight()
     {
@@ -52,6 +64,9 @@ public class BlockScript : MonoBehaviour
             transform.Rotate(0, 0, -90);
         }
     }
+    /// <summary>
+    /// ブロックを左回転させる
+    /// </summary>
     public void RotateLeft()
     {
         if (isRotate)

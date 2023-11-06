@@ -10,22 +10,25 @@ public class BordScripts : MonoBehaviour
     [SerializeField, Header("マップの広さ")]
     private int _height = 30, _width = 10, _header = 8;
     private int _score = default;//スコアの数値
+    private int _blockAroundCheck = default;//置いたブロックの周りの確認
 
-    //Tミノブロックであるか
-    private bool isTSpin = default;
+    private bool isTSpin = default; //Tミノブロックであるか
 
     [SerializeField, Header("スコアのテキスト")]
     private Text _scoreText = default;
     [SerializeReference, Header("消し方の種類")]
     private Text _deleteType;
 
-    private Transform[,] _grid = default;
+    private Transform[,] _grid = default;//フィールドの大きさ
     private void Awake()
     {
+        //配列生成
         _grid = new Transform[_width, _height];
     }
+
     private void Start()
     {
+        //枠線を作る
         CreateBoard();
     }
     /// <summary>
@@ -52,10 +55,13 @@ public class BordScripts : MonoBehaviour
     /// <returns></returns>
     public bool CheckPosition(BlockScript block)
     {
+        //Transformを取得
         foreach (Transform B in block.transform)
         {
+            //Transformを切り上げしてintにする
             Vector2 pos = RoundingScript.Round(B.position);
 
+            //下にブロックがあったらfalseを返す
             if (!BoardOutCheck((int)pos.x, (int)pos.y) || BlockCheck((int)pos.x, (int)pos.y, block))
             {
                 return false;
@@ -96,37 +102,40 @@ public class BordScripts : MonoBehaviour
         //Tスピンかどうか置いた場所の周りを確認
         if (block.GetTspin == true)
         {
-            int Count = 0;
+            _blockAroundCheck = 0;
             pos = block.transform.position;
+            //枠内にあるかどうか
             if (BoardOutCheck((int)pos.x + 1, (int)pos.y + 1))
             {
+                //ブロックがあればカウントアップ
                 if (_grid[(int)pos.x + 1, (int)pos.y + 1] != null)
                 {
-                    Count++;
+                    _blockAroundCheck++;
                 }
             }
             if (BoardOutCheck((int)pos.x + 1, (int)pos.y - 1))
             {
                 if (_grid[(int)pos.x + 1, (int)pos.y - 1] != null)
                 {
-                    Count++;
+                    _blockAroundCheck++;
                 }
             }
             if (BoardOutCheck((int)pos.x - 1, (int)pos.y + 1))
             {
                 if (_grid[(int)pos.x - 1, (int)pos.y + 1] != null)
                 {
-                    Count++;
+                    _blockAroundCheck++;
                 }
             }
             if (BoardOutCheck((int)pos.x - 1, (int)pos.y - 1))
             {
                 if (_grid[(int)pos.x - 1, (int)pos.y - 1] != null)
                 {
-                    Count++;
+                    _blockAroundCheck++;
                 }
             }
-            if (Count >= 3)
+            //ブロックの周りが3つ以上だったらTスピン
+            if (_blockAroundCheck >= 3)
             {
                 isTSpin = true;
             }
@@ -139,17 +148,22 @@ public class BordScripts : MonoBehaviour
     {
         int DeleteCount = 0;
 
+        //揃った列を消して1段下げる
         for (int y = 0; y < _height; y++)
         {
+            //揃った列があるかどうか
             if (IsComplete(y))
             {
+                //列を消す
                 ClearRow(y);
-
+                //列を下げる
                 ShitRowsDown(y + 1);
+                //消えた列をカウントアップ
                 DeleteCount++;
                 y--;
             }
         }
+        //TSpinの時消えた列にの数で表示してスコアアップ
         if (isTSpin)
         {
             switch (DeleteCount)
@@ -168,6 +182,7 @@ public class BordScripts : MonoBehaviour
                     break;
             }
         }
+        //4列以上消えたらテトリスを表示
         else if (DeleteCount >= 4)
         {
             _deleteType.text = "TETRIS";
@@ -176,6 +191,7 @@ public class BordScripts : MonoBehaviour
         }
         else
         {
+            //何もなかったら表示しない
             _deleteType.text = "";
         }
     }
@@ -188,6 +204,7 @@ public class BordScripts : MonoBehaviour
     {
         for (int x = 0; x < _width; x++)
         {
+            //１か所でもからだったらfalseを返す
             if (_grid[x, y] == null)
             {
                 return false;
@@ -205,7 +222,9 @@ public class BordScripts : MonoBehaviour
         {
             if (_grid[x, y] != null)
             {
+                //ポジションにあるオブジェクトを消す
                 Destroy(_grid[x, y].gameObject);
+                //スコア加算
                 _score += 10;
                 _scoreText.text = "Score:" + _score.ToString();
             }
@@ -224,8 +243,11 @@ public class BordScripts : MonoBehaviour
             {
                 if (_grid[x, y] != null)
                 {
+                    //配列を下にずらす
                     _grid[x, y - 1] = _grid[x, y];
+                    //ずらした場所をnullにする
                     _grid[x, y] = null;
+                    //オブジェクトを下に動かす
                     _grid[x, y - 1].position += new Vector3(0, -1, 0);
                 }
             }
@@ -240,6 +262,7 @@ public class BordScripts : MonoBehaviour
     {
         foreach (Transform T in block.transform)
         {
+            //ポジションが上の範囲を越えたらtrueを返す
             if (T.transform.position.y >= _height - _header - 1)
             {
                 return true;
