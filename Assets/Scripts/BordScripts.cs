@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class BordScripts : MonoBehaviour
 {
     [SerializeField]
-    private Transform _emptySprite = default;
+    private Transform _emptySprite = default;//マス目のSprite
     [SerializeField, Header("マップの広さ")]
     private int _height = 30, _width = 10, _header = 8;
     private int _score = default;//スコアの数値
@@ -38,6 +38,7 @@ public class BordScripts : MonoBehaviour
     {
         if (_emptySprite)
         {
+            //高さ制限まで作る
             for (int y = 0; y < _height - _header; y++)
             {
                 for (int x = 0; x < _width; x++)
@@ -61,7 +62,7 @@ public class BordScripts : MonoBehaviour
             //Transformを切り上げしてintにする
             Vector2 pos = RoundingScript.Round(B.position);
 
-            //下にブロックがあったらfalseを返す
+            //下にブロックがなかったらかつボードの内部だったらfalseを返す
             if (!BoardOutCheck((int)pos.x, (int)pos.y) || BlockCheck((int)pos.x, (int)pos.y, block))
             {
                 return false;
@@ -83,7 +84,7 @@ public class BordScripts : MonoBehaviour
     /// <returns></returns>
     private bool BlockCheck(int x, int y, BlockScript block)
     {
-        //二次元配列が空いていない時と親が違うブロックの時
+        //二次元配列が空いていない時かつ親が違うブロックの時
         return (_grid[x, y] != null && _grid[x, y].parent != block.transform);
     }
     /// <summary>
@@ -92,7 +93,8 @@ public class BordScripts : MonoBehaviour
     /// <param name="block"></param>
     public void SaveBlockInGrid(BlockScript block)
     {
-        isTSpin = false;
+        isTSpin = false;//TSpinであるか
+        //オブジェクトの位置を取得する
         Vector2 pos = new Vector2(0, 0);
         foreach (Transform Item in block.transform)
         {
@@ -160,6 +162,7 @@ public class BordScripts : MonoBehaviour
                 ShitRowsDown(y + 1);
                 //消えた列をカウントアップ
                 DeleteCount++;
+                //yの値を戻す
                 y--;
             }
         }

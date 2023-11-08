@@ -8,10 +8,12 @@ public class SpawnerScript : MonoBehaviour
     private BlockScript[] _blocks = default;
     [SerializeField,Header("ブロックが出てくる順番")]
     private int[] _blooksLen = default;
+    //_blooksLenのインデックス値
     private int _lenPoint = default;
     //ネクストを表示させたい数
     private BlockScript[] _saveBloocks = new BlockScript[3];
 
+    //ネクストミノを表示させる位置
     private Vector3 _nestFastPosition = new Vector3(10, -6, 0);
     private Vector3 _nestSecondPosition = new Vector3(10, -10, 0);
     private Vector3 _nestThirdPosition = new Vector3(10, -14, 0);
@@ -28,6 +30,7 @@ public class SpawnerScript : MonoBehaviour
     /// <returns></returns>
     private BlockScript GetRandomBlock()
     {
+        //中身が入っているか
         if (_blocks[_blooksLen[_lenPoint]])
         {
             //lenPointを1づつ増やす
@@ -37,6 +40,7 @@ public class SpawnerScript : MonoBehaviour
             {
                 _lenPoint = 0;
             }
+            //生成するブロック渡す
             return _blocks[_blooksLen[_lenPoint]];
         }
         else
@@ -90,7 +94,7 @@ public class SpawnerScript : MonoBehaviour
         {
             i = _blooksLen[_lenPoint + 1];
         }
-        //ブロックを生成
+        //1番目ブロックを生成
         _saveBloocks[0] = Instantiate(_blocks[i], transform.position + _nestFastPosition, Quaternion.identity);
         //配列を超える場合最初に戻る
         if (_lenPoint + 2 < _blooksLen.Length)
@@ -102,7 +106,9 @@ public class SpawnerScript : MonoBehaviour
         {
             i = _lenPoint + 2 - _blooksLen.Length;
         }
+        //2番目ブロックを生成
         _saveBloocks[1] = Instantiate(_blocks[i], transform.position + _nestSecondPosition, Quaternion.identity);
+
         //配列を超える場合最初に戻る
         if (_lenPoint + 3 < _blooksLen.Length)
         {
@@ -113,6 +119,7 @@ public class SpawnerScript : MonoBehaviour
         {
             i = _lenPoint + 3 - _blooksLen.Length;
         }
+        //3番目ブロックを生成
         _saveBloocks[2] = Instantiate(_blocks[i], transform.position + _nestThirdPosition, Quaternion.identity);
 
         //すべて入ってたらreturnする

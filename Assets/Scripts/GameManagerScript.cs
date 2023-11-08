@@ -8,7 +8,9 @@ public class GameManagerScript : MonoBehaviour
     [SerializeField, Header("ゴーストブロックの色")]
     private Color _colorWhite = default;
     //ゴーストブロックの位置調整
-    private Vector3 _ghostBlockPosition = new Vector3(0, 0, 0.5f);
+    private Vector3 _ghostBlockPosition = new Vector3(0.5f, 0.5f, 0);
+    //ホールドブロックの位置
+    private Vector3 _holdBlockPosition = new Vector3(-6, 15, 0);
 
     private SpawnerScript _spawner = default;//ブロックスポナー
     private BlockScript _activeBlock = default;//生成されたブロック格納
@@ -63,7 +65,7 @@ public class GameManagerScript : MonoBehaviour
             //生成したブロックを格納する
             _activeBlock = _spawner.SpwnBlock();
             //生成された同じブロックをゴーストブロックとして生成
-            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position , Quaternion.identity);
             //ゴーストブロックの色変え
             ColorChange();
             //ゴーストを下まで落とす
@@ -89,7 +91,7 @@ public class GameManagerScript : MonoBehaviour
     }
     private void PlayerInput()
     {
-        //右に移動
+        //Dを押している間右に移動
         if (Input.GetKey(KeyCode.D) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.D))
         {
             //固定まで判定
@@ -106,7 +108,7 @@ public class GameManagerScript : MonoBehaviour
                 _ghostBlock.MoveLeft();
             }
         }
-        //左に移動
+        //Aを押してる間左に移動
         else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
         {
             //固定まで判定
@@ -123,7 +125,7 @@ public class GameManagerScript : MonoBehaviour
                 _ghostBlock.MoveRight();
             }
         }
-        //右回転
+        //Eを押したら右回転
         else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
         {
             //固定まで判定
@@ -141,13 +143,14 @@ public class GameManagerScript : MonoBehaviour
                 {
                     TRotationRight();
                 }
+                //回転補正Iミノブロック
                 if (_activeBlock.GetISpin)
                 {
                     IRotationRight();
                 }
             }
         }
-        //左回転
+        //Qを押したら左回転
         else if (Input.GetKey(KeyCode.Q) && (Time.time > _nextKeyRotateTime))
         {
             //固定まで判定
@@ -160,22 +163,24 @@ public class GameManagerScript : MonoBehaviour
             //はみ出たら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
+                //回転補正OとI以外
                 if (_activeBlock.GetSuperspin)
                 {
                     TRotationLeft();
                 }
+                //回転補正Iミノブロック
                 if (_activeBlock.GetISpin)
                 {
                     IRotationLeft();
                 }
             }
         }
-        //ソフトドロップ
+        //ソフトドロップSを押すと早く落ちる
         else if (Input.GetKey(KeyCode.S) && (Time.time > _nextKeyDownTime) || Time.time > _nextDropTimer)
         {
             //下に動かす
             _activeBlock.MoveDown();
-
+            //入力タイム
             _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
             _nextDropTimer = Time.time + _dropInterval;
 
@@ -200,7 +205,7 @@ public class GameManagerScript : MonoBehaviour
                 }
             }
         }
-        //ハードドロップ
+        //Wを押したらハードドロップ
         else if (Input.GetKeyDown(KeyCode.W))
         {
             //ぶつかるまで繰り返す
@@ -209,7 +214,7 @@ public class GameManagerScript : MonoBehaviour
                 //下に動かす
                 _activeBlock.MoveDown();
             }
-
+            //底についた処理
             BottomBoard();
 
         }
@@ -220,14 +225,14 @@ public class GameManagerScript : MonoBehaviour
             isChangeBlock = true;
             if (_holdBlock == default)
             {
-                //1回目の処理
-                _holdBlock = Instantiate(_activeBlock, new Vector3(-6, 15, 0), Quaternion.identity);
+                //現在のブロックを生成
+                _holdBlock = Instantiate(_activeBlock, _holdBlockPosition, Quaternion.identity);
                 //ブロック削除
                 Destroy(_activeBlock.gameObject);
                 Destroy(_ghostBlock.gameObject);
                 //ブロック生成
                 _activeBlock = _spawner.SpwnBlock();
-                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
+                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
                 //色を変える
                 ColorChange();
                 //タイムの初期化
@@ -249,16 +254,15 @@ public class GameManagerScript : MonoBehaviour
                 //Iミノだったら位置調整
                 if (_activeBlock.GetISpin)
                 {
-                    _activeBlock.transform.position += new Vector3(0.5f, 0.5f, 0);
+                    _activeBlock.transform.position += _ghostBlockPosition;
                 }
-                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
+                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position , Quaternion.identity);
                 //色を変える
                 ColorChange();
                 //ホールドブロックを削除
                 Destroy(_holdBlock.gameObject);
                 //表示ようホールドブロック生成
-                _holdBlock = Instantiate(_saveBlock, new Vector3(-6, 15, 0), Quaternion.identity);
-
+                _holdBlock = Instantiate(_saveBlock, _holdBlockPosition, Quaternion.identity);
                 //タイムの初期化
                 ResetTime();
             }
@@ -269,7 +273,7 @@ public class GameManagerScript : MonoBehaviour
     /// </summary>
     private void BlockLook()
     {
-        //着地してから動ける回数
+        //着地してから動ける回数をカウントアップ
         _moveCount++;
         //着地から固定までの時間
         _lookTime = Time.time + _lookTimeInterval;
@@ -286,11 +290,13 @@ public class GameManagerScript : MonoBehaviour
         _lookTime = Time.time;
     }
     /// <summary>
-    /// 底に着いた時の処理4
+    /// 底に着いた時の処理
     /// </summary>
     private void BottomBoard()
     {
+        //ミノブロックを1つ上に
         _activeBlock.MoveUp();
+        //一定時間経過したまたは１５回ミノブロックを動かしたか
         if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.W) || _moveCount >= 15)
         {
             //配列に格納
@@ -300,14 +306,15 @@ public class GameManagerScript : MonoBehaviour
             //ブロックを消して次のブロックを生成
             Destroy(_ghostBlock.gameObject);
             _activeBlock = _spawner.SpwnBlock();
-            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position + _ghostBlockPosition, Quaternion.identity);
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
             ColorChange();
 
             //値の初期化
             ResetTime();
             _moveCount = 0;
             isGround = false;
-            _bord.ClearAllRows();//揃っていれば削除
+            //揃っていれば削除
+            _bord.ClearAllRows();
         }
     }
     /// <summary>
@@ -338,7 +345,7 @@ public class GameManagerScript : MonoBehaviour
     private void DownGhostBlock()
     {
         //ゴーストブロックの位置を親の場所に移動
-        _ghostBlock.transform.position = _activeBlock.transform.position + _ghostBlockPosition;
+        _ghostBlock.transform.position = _activeBlock.transform.position;
         //ぶつかるまで下に動かす
         while (_bord.CheckPosition(_ghostBlock))
         {
@@ -361,6 +368,28 @@ public class GameManagerScript : MonoBehaviour
             //色を変える
             chidren = child.GetComponent<SpriteRenderer>();
             chidren.color = _colorWhite;
+        }
+    }
+    /// <summary>
+    /// 左回転の回転補正
+    /// </summary>
+    private void TRotationLeft()
+    {
+        switch (_activeBlock.transform.rotation.eulerAngles.z)
+        {
+            case 0:
+                LeftAngleZero();
+                break;
+            case 90:
+                LeftAngleNinety();
+                break;
+            case 180:
+                LeftAngleHundred();
+                break;
+            case 270:
+                LeftAngleTwoHundred();
+                break;
+
         }
     }
     /// <summary>
@@ -503,28 +532,7 @@ public class GameManagerScript : MonoBehaviour
             }
         }
     }
-    /// <summary>
-    /// 左回転の回転補正
-    /// </summary>
-    private void TRotationLeft()
-    {
-        switch (_activeBlock.transform.rotation.eulerAngles.z)
-        {
-            case 0:
-                LeftAngleZero();
-                break;
-            case 90:
-                LeftAngleNinety();
-                break;
-            case 180:
-                LeftAngleHundred();
-                break;
-            case 270:
-                LeftAngleTwoHundred();
-                break;
-
-        }
-    }
+   
     /// <summary>
     /// 右回転の回転補正
     /// </summary>
