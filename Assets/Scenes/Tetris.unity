@@ -831,10 +831,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7766fe65cdb4d4a44960cc8da68b5ed3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _emptySprite: {fileID: 1897812037294439767, guid: 8e9de60d138a06f4683ab997d3799734, type: 3}
+  _emptySpriteTransform: {fileID: 1897812037294439767, guid: 8e9de60d138a06f4683ab997d3799734, type: 3}
   _height: 30
   _width: 10
-  _header: 8
+  _header: 21
   _scoreText: {fileID: 580054942}
   _deleteType: {fileID: 2035679597}
 --- !u!4 &1173708609

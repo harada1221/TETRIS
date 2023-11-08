@@ -4,6 +4,7 @@ using UnityEngine;
 
 public static class RoundingScript
 {
+    //’l‚ÌØ‚èã‚°‚ğs‚¤
     public static Vector2 Round(Vector2 i)
     {
         return new Vector2(Mathf.Round(i.x), Mathf.Round(i.y));

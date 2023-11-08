@@ -46,6 +46,9 @@ public class GameManagerScript : MonoBehaviour
     private bool isChangeBlock = false;//ホールドをしたか
     private bool isGround = false;//ブロックが下にぶつかったか
 
+    /// <summary>
+    /// 更新前処理
+    /// </summary>
     private void Start()
     {
         //スポナーオブジェクトを格納
@@ -88,10 +91,14 @@ public class GameManagerScript : MonoBehaviour
         DownGhostBlock();
         //プレイヤーの操作
         PlayerInput();
-    }
+    }/// <summary>
+     /// プレイヤー操作
+     /// GameManagerScriptに書いてるのはよいくない
+     /// 別クラスにする
+     /// </summary>
     private void PlayerInput()
     {
-        //Dを押している間右に移動
+        //Dを押したときと押している間右に移動
         if (Input.GetKey(KeyCode.D) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.D))
         {
             //固定まで判定
@@ -104,11 +111,12 @@ public class GameManagerScript : MonoBehaviour
             //はみ出してたら戻す
             if (!_bord.CheckPosition(_activeBlock))
             {
+                //いんっぷと以外の処理も行っているよくない
                 _activeBlock.MoveLeft();
                 _ghostBlock.MoveLeft();
             }
         }
-        //Aを押してる間左に移動
+        //Aを押したときと押してる間左に移動
         else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
         {
             //固定まで判定
@@ -125,7 +133,7 @@ public class GameManagerScript : MonoBehaviour
                 _ghostBlock.MoveRight();
             }
         }
-        //Eを押したら右回転
+        //Eを押したときと押したら右回転
         else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
         {
             //固定まで判定
@@ -240,7 +248,7 @@ public class GameManagerScript : MonoBehaviour
             }
             else
             {
-                //入れ替え
+                //ブロックの入れ替え
                 _saveBlock = _activeBlock;
                 _activeBlock = _holdBlock;
                 _holdBlock = _saveBlock;
@@ -296,11 +304,13 @@ public class GameManagerScript : MonoBehaviour
     {
         //ミノブロックを1つ上に
         _activeBlock.MoveUp();
-        //一定時間経過したまたは１５回ミノブロックを動かしたか
+        //一定時間経過したまたは１５回ミノブロックを動かしたら固定
         if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.W) || _moveCount >= 15)
         {
             //配列に格納
             _bord.SaveBlockInGrid(_activeBlock);
+            //TSpinであるか判定
+            _bord.TSpinCheck(_activeBlock);
             //ホールドをできるように
             isChangeBlock = false;
             //ブロックを消して次のブロックを生成
@@ -365,7 +375,7 @@ public class GameManagerScript : MonoBehaviour
         // 子オブジェクトを全て取得する
         foreach (Transform child in parent)
         {
-            //色を変える
+            //SpriteRendererの色を変える
             chidren = child.GetComponent<SpriteRenderer>();
             chidren.color = _colorWhite;
         }

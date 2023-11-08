@@ -13,6 +13,9 @@ public class SpawnerScript : MonoBehaviour
     //ネクストを表示させたい数
     private BlockScript[] _saveBloocks = new BlockScript[3];
 
+    //ミノの位置調整
+    private Vector3 _minoBlockRevision = new Vector3(0.5f, 0.5f, 0);
+
     //ネクストミノを表示させる位置
     private Vector3 _nestFastPosition = new Vector3(10, -6, 0);
     private Vector3 _nestSecondPosition = new Vector3(10, -10, 0);
@@ -22,7 +25,7 @@ public class SpawnerScript : MonoBehaviour
     private void Awake()
     {
         //最初の値だけランダムで決める
-        _lenPoint = Random.RandomRange(0, _blooksLen.Length);
+        _lenPoint = Random.Range(0, _blooksLen.Length);
     }
     /// <summary>
     /// ブロックを選ぶ
@@ -59,10 +62,10 @@ public class SpawnerScript : MonoBehaviour
         //Iミノブロックだけ位置調整
         if (block.GetISpin)
         {
-            block.transform.position += new Vector3(0.5f, 0.5f, 0);
+            block.transform.position += _minoBlockRevision;
         }
         //ネクストを更新する
-        LookBlock();
+        NextBlock();
 
         if (block)
         {
@@ -77,7 +80,7 @@ public class SpawnerScript : MonoBehaviour
     /// ネクストのブロックを表示
     /// </summary>
     /// <returns></returns>
-    private BlockScript[] LookBlock()
+    private BlockScript[] NextBlock()
     {
         //ネクストを消す
         for (int j = 0; j < _saveBloocks.Length; j++)

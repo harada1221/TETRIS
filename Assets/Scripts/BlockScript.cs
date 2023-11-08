@@ -31,28 +31,28 @@ public class BlockScript : MonoBehaviour
     /// </summary>
     public void MoveLeft()
     {
-        Move(new Vector3(-1, 0, 0));
+        Move(Vector3.left);
     }
     /// <summary>
     /// 右移動
     /// </summary>
     public void MoveRight()
     {
-        Move(new Vector3(1, 0, 0));
+        Move(Vector3.right);
     }
     /// <summary>
     /// 上移動
     /// </summary>
     public void MoveUp()
     {
-        Move(new Vector3(0, 1, 0));
+        Move(Vector3.up);
     }
     /// <summary>
     /// 下移動
     /// </summary>
     public void MoveDown()
     {
-        Move(new Vector3(0, -1, 0));
+        Move(Vector3.down);
     }
     /// <summary>
     /// ブロックを右回転させる
