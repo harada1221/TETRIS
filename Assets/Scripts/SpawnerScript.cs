@@ -6,31 +6,40 @@ public class SpawnerScript : MonoBehaviour
 {
     [SerializeField, Header("生成するブロック")]
     private BlockScript[] _blocks = default;
-    [SerializeField,Header("ブロックが出てくる順番")]
+    [SerializeField, Header("ブロックが出てくる順番")]
     private int[] _blooksLen = default;
     //_blooksLenのインデックス値
     private int _lenPoint = default;
     //ネクストを表示させたい数
     private BlockScript[] _saveBloocks = new BlockScript[3];
 
-    //ミノの位置調整
+    //Iミノの位置調整
     private Vector3 _minoBlockRevision = new Vector3(0.5f, 0.5f, 0);
 
-    //ネクストミノを表示させる位置
+    //ネクストミノを表示させるそれぞれの位置
     private Vector3 _nestFastPosition = new Vector3(10, -6, 0);
     private Vector3 _nestSecondPosition = new Vector3(10, -10, 0);
     private Vector3 _nestThirdPosition = new Vector3(10, -14, 0);
 
+    //ネクストミノが何番先か加算する値
+    private const int _fastIndex = 1;
+    private const int _secondIndex = 2;
+    private const int _thirdIndex = 3;
+    //ネクストブロックを保存する配列の値
+    private int _saveIndex = 0;
 
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
     private void Awake()
     {
         //最初の値だけランダムで決める
         _lenPoint = Random.Range(0, _blooksLen.Length);
     }
     /// <summary>
-    /// ブロックを選ぶ
+    /// <para>ブロックを選ぶ</para>
     /// </summary>
-    /// <returns></returns>
+    /// <returns>BlockScript</returns>
     private BlockScript GetRandomBlock()
     {
         //中身が入っているか
@@ -52,9 +61,9 @@ public class SpawnerScript : MonoBehaviour
         }
     }
     /// <summary>
-    /// 選ばれたブロックを生成
+    /// <para>選ばれたブロックを生成</para>
     /// </summary>
-    /// <returns></returns>
+    /// <returns>BlockScript</returns>
     public BlockScript SpwnBlock()
     {
         //選ばれたブロックを生成
@@ -67,6 +76,7 @@ public class SpawnerScript : MonoBehaviour
         //ネクストを更新する
         NextBlock();
 
+        //生成されていたら渡す
         if (block)
         {
             return block;
@@ -77,9 +87,9 @@ public class SpawnerScript : MonoBehaviour
         }
     }
     /// <summary>
-    /// ネクストのブロックを表示
+    /// <para>ネクストのブロックを表示する</para>
     /// </summary>
-    /// <returns></returns>
+    /// <returns>BlockScript[]</returns>
     private BlockScript[] NextBlock()
     {
         //ネクストを消す
@@ -90,49 +100,68 @@ public class SpawnerScript : MonoBehaviour
                 Destroy(_saveBloocks[j].gameObject);
             }
         }
-        //1つ先のブロックを表示させる
+        //1つ先のブロックを決定するindex値
         int i = 0;
         //配列を超える場合最初に戻る
-        if (_lenPoint + 1 < _blooksLen.Length)
+        if (_lenPoint + _fastIndex < _blooksLen.Length)
         {
-            i = _blooksLen[_lenPoint + 1];
+            i = _blooksLen[_lenPoint + _fastIndex];
         }
+        //ブロックのホールドを保存する値を初期化
+        _saveIndex = 0;
         //1番目ブロックを生成
-        _saveBloocks[0] = Instantiate(_blocks[i], transform.position + _nestFastPosition, Quaternion.identity);
+        _saveBloocks[_saveIndex] = Instantiate(_blocks[i], transform.position + _nestFastPosition, Quaternion.identity);
+
+        //カウントアップ
+        _saveIndex++;
+
         //配列を超える場合最初に戻る
-        if (_lenPoint + 2 < _blooksLen.Length)
+        if (_lenPoint + _secondIndex < _blooksLen.Length)
         {
-            i = _blooksLen[_lenPoint + 2];
+            i = _blooksLen[_lenPoint + _secondIndex];
         }
         //2つ先を表示
         else
         {
-            i = _lenPoint + 2 - _blooksLen.Length;
+            i = _lenPoint + _secondIndex - _blooksLen.Length;
         }
         //2番目ブロックを生成
-        _saveBloocks[1] = Instantiate(_blocks[i], transform.position + _nestSecondPosition, Quaternion.identity);
+        _saveBloocks[_saveIndex] = Instantiate(_blocks[i], transform.position + _nestSecondPosition, Quaternion.identity);
+
+        //カウントアップ
+        _saveIndex++;
 
         //配列を超える場合最初に戻る
-        if (_lenPoint + 3 < _blooksLen.Length)
+        if (_lenPoint + _thirdIndex < _blooksLen.Length)
         {
-            i = _blooksLen[_lenPoint + 3];
+            i = _blooksLen[_lenPoint + _thirdIndex];
         }
         //3つ先を表示
         else
         {
-            i = _lenPoint + 3 - _blooksLen.Length;
+            i = _lenPoint + _thirdIndex - _blooksLen.Length;
         }
         //3番目ブロックを生成
-        _saveBloocks[2] = Instantiate(_blocks[i], transform.position + _nestThirdPosition, Quaternion.identity);
+        _saveBloocks[_saveIndex] = Instantiate(_blocks[i], transform.position + _nestThirdPosition, Quaternion.identity);
 
-        //すべて入ってたらreturnする
-        if (_saveBloocks[0] != null && _saveBloocks[1] != null && _saveBloocks[2] != null)
+        //カウントアップ
+        _saveIndex++;
+
+        //配列がすべて入っているか確認する
+        for (int K = 0; K < _saveIndex; K++)
         {
-            return _saveBloocks;
+            //入ってたら次の値に
+            if (_saveBloocks[K] != null)
+            {
+                continue;
+            }
+            else
+            {
+                //なかったらnullを返す
+                return null;
+            }
         }
-        else
-        {
-            return null;
-        }
+        //BlockScriptの配列を渡す
+        return _saveBloocks;
     }
 }

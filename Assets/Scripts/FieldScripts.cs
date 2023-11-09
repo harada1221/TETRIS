@@ -1,39 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class BordScripts : MonoBehaviour
+public class FieldScripts : MonoBehaviour
 {
-    [SerializeField]
-    private Transform _emptySpriteTransform = default;//マス目のSpriteのTransform
-    [SerializeField, Header("マップの高さ")]
+    [SerializeField, Header("マス目のSpriteのTransform")]
+    private Transform _emptySpriteTransform = default;
+    [SerializeField, Header("フィールドの高さ")]
     private int _height = 30;
-    [SerializeField, Header("マップの横")]
+    [SerializeField, Header("フィールドの横")]
     private int _width = 10;
-    [SerializeField, Header("マップの高さ上限")]
+    [SerializeField, Header("フィールドの高さ上限")]
     private int _header = 21;
-    //スコアをここで管理するのよくない別のクラスに
-    private int _score = default;//スコアの数値
     //置いたブロックの周りのブロック数
     private int _blockAroundCheck = default;
-
    　//Tスピンであるか
     private bool _isTSpin = default;
-
-    [SerializeField, Header("スコアのテキスト")]
-    private Text _scoreText = default;
-    [SerializeReference, Header("特殊消しを表示するテキスト")]
-    private Text _deleteType = default;
+    //スコア管理のスクリプト
+    private ScoreManagerScript _scoreManager = default;
     //フィールドの配列
     private Transform[,] _grid = default;
-    //初期設定
+    /// <summary>
+    /// 初期設定
+    /// </summary>
     private void Awake()
     {
         //配列生成
         _grid = new Transform[_width, _height];
         //枠線を作る
         CreateBoard();
+        //ScoreManagerScriptを取得
+        _scoreManager = GameObject.FindObjectOfType<ScoreManagerScript>();
     }
     /// <summary>
     /// ボードを作る
@@ -45,9 +42,10 @@ public class BordScripts : MonoBehaviour
         {
             return;
         }
-        //高さと横の制限まで作る
+        //高さの上限まで繰り返す
         for (int y = 0; y < _header; y++)
         {
+            //横の上限まで繰り返す
             for (int x = 0; x < _width; x++)
             {
                 //emptySpriteを生成
@@ -61,7 +59,7 @@ public class BordScripts : MonoBehaviour
     /// 衝突判定をする
     /// </summary>
     /// <param name="parentObj"></param>
-    /// <returns>衝突している</returns>
+    /// <returns>bool</returns>
     public bool CheckPosition(BlockScript parentObj)
     {
         //Transformを取得
@@ -70,13 +68,14 @@ public class BordScripts : MonoBehaviour
             //Transformを切り上げしてintにする
             Vector2 pos = RoundingScript.Round(Block.position);
 
-            //下にブロックがあるかつボードの外部部にある
+            //下にブロックがあるかつボードの外部部にあるか
             if (!BoardOutCheck((int)pos.x, (int)pos.y) || BlockCheck((int)pos.x, (int)pos.y, parentObj))
             {
-                //falseを返す
+                //範囲外またはブロックがあったらfalseを返す
                 return false;
             }
         }
+        //なかったらtrueを返す
         return true;
     }
     /// <summary>
@@ -95,7 +94,7 @@ public class BordScripts : MonoBehaviour
     private bool BlockCheck(int x, int y, BlockScript block)
     {
         //二次元配列が空いていない時かつ親が違うブロックの時
-        return (_grid[x, y] != null && _grid[x, y].parent != block.transform);
+        return (_grid[x, y] != null) && (_grid[x, y].parent != block.transform);
     }
     /// <summary>
     /// 配列にブロックを格納
@@ -107,6 +106,7 @@ public class BordScripts : MonoBehaviour
         Vector2 pos = new Vector2(0, 0);
         foreach (Transform Item in block.transform)
         {
+            //配列に格納する
             pos = RoundingScript.Round(Item.position);
             _grid[(int)pos.x, (int)pos.y] = Item;
         }
@@ -125,9 +125,11 @@ public class BordScripts : MonoBehaviour
         //Tスピンかどうか置いた場所の周りを確認
         if (block.GetTspin == true)
         {
+            //周りのブロックの数
             _blockAroundCheck = 0;
             pos = block.transform.position;
-            //枠内にあるかどうか
+            //枠内にあるかどうか検索する
+            //あったらカウントアップ
             if (BoardOutCheck((int)pos.x + 1, (int)pos.y + 1))
             {
                 //ブロックがあればカウントアップ
@@ -179,10 +181,10 @@ public class BordScripts : MonoBehaviour
         for (int y = 0; y < _height; y++)
         {
             //揃った列があるかどうか
-            if (IsComplete(y))
+            if (LineCheck(y))
             {
                 //列を消す
-                ClearRow(y);
+                LineDelete(y);
                 //列を下げる
                 LinesDown(y + 1);
                 //消えた列をカウントアップ
@@ -194,81 +196,79 @@ public class BordScripts : MonoBehaviour
         //TSpinの時消えた列にの数で表示してスコアアップ
         if (_isTSpin)
         {
-            switch (DeleteCount)
-            {
-                case 1:
-                    _deleteType.text = "T-Spin Single";
-                    _score += 1000;
-                    break;
-                case 2:
-                    _deleteType.text = "T-Spin Double";
-                    _score += 2000;
-                    break;
-                case 3:
-                    _deleteType.text = "T-Spin Triple";
-                    _score += 3000;
-                    break;
-            }
+            //Tスピンを表示
+            _scoreManager.TspinDisplay(DeleteCount);
+            //スコア加算
+            _scoreManager.AddScorePoint();
         }
         //4列以上消えたらテトリスを表示
         else if (DeleteCount >= 4)
         {
-            _deleteType.text = "TETRIS";
-            _score += 1000;
-            _scoreText.text = "Score:" + _score.ToString();
+            //テトリス表示
+            _scoreManager.TetrisDisply();
+            //スコア加算
+            _scoreManager.AddScorePoint();
         }
         else
         {
             //何もなかったら表示しない
-            _deleteType.text = "";
+            _scoreManager.TextClear();
         }
     }
     /// <summary>
     /// 揃った列があるかどうか
     /// </summary>
     /// <param name="y">置いた場所の高さ</param>
-    /// <returns>1列揃ってる</returns>
-    private bool IsComplete(int y)
+    /// <returns>bool</returns>
+    private bool LineCheck(int y)
     {
+        //横の上限まで繰り返す
         for (int x = 0; x < _width; x++)
         {
-            //１か所でもからだったらfalseを返す
+            //１か所でもnullか
             if (_grid[x, y] == null)
             {
+                //nullだったらfalseを返す
                 return false;
             }
         }
+        //すべて埋まってたらtrueを返す
         return true;
     }
     /// <summary>
     /// 揃った列を消す
     /// </summary>
     /// <param name="y">置いた列</param>
-    private void ClearRow(int y)
+    private void LineDelete(int y)
     {
+        //置いた列の横を検索する
         for (int x = 0; x < _width; x++)
         {
+            //ポジションにオブジェクトがあるか
             if (_grid[x, y] != null)
             {
                 //ポジションにあるオブジェクトを消す
                 Destroy(_grid[x, y].gameObject);
-                //スコア加算
-                _score += 10;
-                _scoreText.text = "Score:" + _score.ToString();
             }
+            //消した場所を初期化する
             _grid[x, y] = null;
         }
+        //スコア加算
+        _scoreManager.AddScorePoint();
     }
     /// <summary>
     /// 列が消えたら一段下げる
     /// </summary>
-    /// <param name="y">置いたブロックの位置</param>
+    /// <param name="y">置いたブロックの上の位置</param>
     private void LinesDown(int startY)
     {
+        //置いた場所から上限まで繰り返す
         for (int y = startY; y < _height; y++)
         {
+            //横の上限まで繰り返す
             for (int x = 0; x < _width; x++)
             {
+                //なかったら次の場所に
                 if (_grid[x, y] == null)
                 {
                     continue;
@@ -287,17 +287,20 @@ public class BordScripts : MonoBehaviour
     /// ゲームオーバーしているかどうか
     /// </summary>
     /// <param name="block"></param>
-    /// <returns></returns>
-    public bool OverLimit(BlockScript block)
+    /// <returns>bool</returns>
+    public bool GameOverLimit(BlockScript block)
     {
+        //ブロックのポジションを取得
         foreach (Transform T in block.transform)
         {
-            //ポジションが上の範囲を越えたらtrueを返す
+            //ポジションが上の範囲を越えたか
             if (T.position.y >= _header)
             {
+                //越えたらtrueを返す
                 return true;
             }
         }
+        //越えなかったらfalse
         return false;
     }
 }

@@ -15,13 +15,16 @@ public class BlockScript : MonoBehaviour
 
     [SerializeField, Header("Iミノ")]
     private bool isISpin = default;
+    //スパローテーションができるか
     public bool GetSuperspin { get => isSuperRotatiion; }
+    //Tミノブロックか
     public bool GetTspin { get => isTSpin; }
+    //Iミノブロックか
     public bool GetISpin { get => isISpin; }
     /// <summary>
     /// 移動させる
     /// </summary>
-    /// <param name="moveDirection"></param>
+    /// <param name="moveDirection">移動の向き</param>
     private void Move(Vector3 moveDirection)
     {
         transform.position += moveDirection;

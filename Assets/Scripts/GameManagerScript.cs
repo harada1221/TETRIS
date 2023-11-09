@@ -7,21 +7,30 @@ public class GameManagerScript : MonoBehaviour
 {
     [SerializeField, Header("ゴーストブロックの色")]
     private Color _colorWhite = default;
+    [SerializeField,Header("タイトルのシーン")]
+    private string _titleScen = default;
     //ゴーストブロックの位置調整
     private Vector3 _ghostBlockPosition = new Vector3(0.5f, 0.5f, 0);
     //ホールドブロックの位置
     private Vector3 _holdBlockPosition = new Vector3(-6, 15, 0);
 
-    private SpawnerScript _spawner = default;//ブロックスポナー
-    private BlockScript _activeBlock = default;//生成されたブロック格納
-    private BlockScript _ghostBlock = default;//生成されたゴーストブロック
-    private BlockScript _holdBlock = default;//ホールドしたブロックを格納
-    private BlockScript _saveBlock = default;//ホールドしたブロックを入れ替える用
+    //ブロックスポナー
+    private SpawnerScript _spawner = default;
+    //生成されたブロック格納
+    private BlockScript _activeBlock = default;
+    //生成されたゴーストブロック
+    private BlockScript _ghostBlock = default;
+    //ホールドしたブロックを格納
+    private BlockScript _holdBlock = default;
+    //ホールドしたブロックを入れ替える用
+    private BlockScript _saveBlock = default;
     [SerializeField, Header("ブロックが落ちる時間")]
     private float _dropInterval = 0.25f;
-    private float _nextDropTimer = default;//次にブロックが落ちるまでの時間
+    //次にブロックが落ちるまでの時間をカウント
+    private float _nextDropTimer = default;
 
-    private BordScripts _bord = default;//フィールドのスクリプト
+    //フィールドのスクリプト
+    private FieldScripts _bord = default;
     //入力のタイム
     private float _nextKeyDownTime = default;
     private float _nextKeySideTime = default;
@@ -40,11 +49,14 @@ public class GameManagerScript : MonoBehaviour
     private float _nextKeyRotateTimeInterval = default;
     [SerializeField, Header("ブロックの固定の時間")]
     private float _lookTimeInterval = default;
-    [SerializeField]
-    private GameObject _gameOverPanel = default;//ゲームオーバー時のパネル
-    private bool isGameOver = false;//ゲームオーバーの判定
-    private bool isChangeBlock = false;//ホールドをしたか
-    private bool isGround = false;//ブロックが下にぶつかったか
+    [SerializeField, Header("ゲームオーバー時のパネル")]
+    private GameObject _gameOverPanel = default;
+    //ゲームオーバーの判定
+    private bool _isGameOver = false;
+    //ホールドをしたか
+    private bool _isChangeBlock = false;
+    //ブロックが下にぶつかったか
+    private bool _isGround = false;
 
     /// <summary>
     /// 更新前処理
@@ -54,7 +66,7 @@ public class GameManagerScript : MonoBehaviour
         //スポナーオブジェクトを格納
         _spawner = GameObject.FindObjectOfType<SpawnerScript>();
         //ボードのスクリプトを格納
-        _bord = GameObject.FindObjectOfType<BordScripts>();
+        _bord = GameObject.FindObjectOfType<FieldScripts>();
 
         //タイマーの初期設定
         _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
@@ -68,7 +80,7 @@ public class GameManagerScript : MonoBehaviour
             //生成したブロックを格納する
             _activeBlock = _spawner.SpwnBlock();
             //生成された同じブロックをゴーストブロックとして生成
-            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position , Quaternion.identity);
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
             //ゴーストブロックの色変え
             ColorChange();
             //ゴーストを下まで落とす
@@ -80,199 +92,263 @@ public class GameManagerScript : MonoBehaviour
             _gameOverPanel.SetActive(false);
         }
     }
+    /// <summary>
+    /// 更新処理
+    /// </summary>
     private void Update()
     {
         //ゲームオーバーだったら動かさない
-        if (isGameOver)
+        if (_isGameOver)
         {
             return;
         }
         //ゴーストブロックを下まで落とす
         DownGhostBlock();
         //プレイヤーの操作
+        //プレイヤーのインプットをゲームマネージャに書くのはよくない別クラスにすべき
         PlayerInput();
-    }/// <summary>
-     /// プレイヤー操作
-     /// GameManagerScriptに書いてるのはよいくない
-     /// 別クラスにする
-     /// </summary>
+    }
+    /// <summary>
+    /// プレイヤー操作
+    /// 別クラスにする
+    /// プレイヤーのインプットをゲームマネージャに書くのはよくない別クラスにすべき
+    /// </summary>
     private void PlayerInput()
     {
         //Dを押したときと押している間右に移動
         if (Input.GetKey(KeyCode.D) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.D))
         {
-            //固定まで判定
-            BlockLook();
-            //右に動かす
-            _activeBlock.MoveRight();
-            _ghostBlock.MoveRight();
-            //タイマー更新
-            _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
-            //はみ出してたら戻す
-            if (!_bord.CheckPosition(_activeBlock))
-            {
-                //いんっぷと以外の処理も行っているよくない
-                _activeBlock.MoveLeft();
-                _ghostBlock.MoveLeft();
-            }
+            //右移動
+            MoveRight();
         }
         //Aを押したときと押してる間左に移動
         else if (Input.GetKey(KeyCode.A) && (Time.time > _nextKeySideTime) || Input.GetKeyDown(KeyCode.A))
         {
-            //固定まで判定
-            BlockLook();
-            //左に動かす
-            _activeBlock.MoveLeft();
-            _ghostBlock.MoveLeft();
-            //タイマー更新
-            _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
-            //はみ出してたら戻す
-            if (!_bord.CheckPosition(_activeBlock))
-            {
-                _activeBlock.MoveRight();
-                _ghostBlock.MoveRight();
-            }
+            //左移動
+            MoveLeft();
         }
-        //Eを押したときと押したら右回転
+        //Eを押したとき右回転
         else if (Input.GetKey(KeyCode.E) && (Time.time > _nextKeyRotateTime))
         {
-            //固定まで判定
-            BlockLook();
             //右回転
-            _activeBlock.RotateRight();
-            _ghostBlock.RotateRight();
-            //タイマー更新
-            _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
-            //はみ出たら戻す
-            if (!_bord.CheckPosition(_activeBlock))
-            {
-                //回転補正OとI以外
-                if (_activeBlock.GetSuperspin)
-                {
-                    TRotationRight();
-                }
-                //回転補正Iミノブロック
-                if (_activeBlock.GetISpin)
-                {
-                    IRotationRight();
-                }
-            }
+            RotationRight();
         }
         //Qを押したら左回転
         else if (Input.GetKey(KeyCode.Q) && (Time.time > _nextKeyRotateTime))
         {
-            //固定まで判定
-            BlockLook();
             //左回転
-            _activeBlock.RotateLeft();
-            _ghostBlock.RotateLeft();
-            //タイマー更新
-            _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
-            //はみ出たら戻す
-            if (!_bord.CheckPosition(_activeBlock))
-            {
-                //回転補正OとI以外
-                if (_activeBlock.GetSuperspin)
-                {
-                    TRotationLeft();
-                }
-                //回転補正Iミノブロック
-                if (_activeBlock.GetISpin)
-                {
-                    IRotationLeft();
-                }
-            }
+            RotationLeft();
         }
         //ソフトドロップSを押すと早く落ちる
         else if (Input.GetKey(KeyCode.S) && (Time.time > _nextKeyDownTime) || Time.time > _nextDropTimer)
         {
-            //下に動かす
-            _activeBlock.MoveDown();
-            //入力タイム
-            _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
-            _nextDropTimer = Time.time + _dropInterval;
-
-            //はみ出してたら戻す
-            if (!_bord.CheckPosition(_activeBlock))
-            {
-                //範囲外だとゲームオーバー
-                if (_bord.OverLimit(_activeBlock))
-                {
-                    GameOver();
-                }
-                else
-                {
-                    //着地したらカウント開始
-                    if (!isGround)
-                    {
-                        isGround = true;
-                        _lookTime = Time.time + _lookTimeInterval;
-                    }
-                    //底についた処理
-                    BottomBoard();
-                }
-            }
+            //落下速度上昇させる
+            SoftDrop();
         }
         //Wを押したらハードドロップ
         else if (Input.GetKeyDown(KeyCode.W))
         {
-            //ぶつかるまで繰り返す
-            while (_bord.CheckPosition(_activeBlock))
-            {
-                //下に動かす
-                _activeBlock.MoveDown();
-            }
-            //底についた処理
-            BottomBoard();
-
+            //ハードドロップさせる
+            HardDrop();
         }
         //ホールドの処理
-        else if (Input.GetKeyDown(KeyCode.Z) && isChangeBlock == false)
+        else if (Input.GetKeyDown(KeyCode.Z) && _isChangeBlock == false)
         {
-            //ホールドを１度だけにする
-            isChangeBlock = true;
-            if (_holdBlock == default)
+            Hold();
+        }
+    }
+    /// <summary>
+    /// ホールドの処理
+    /// </summary>
+    private void Hold()
+    {
+        //ホールドを１度だけにする
+        _isChangeBlock = true;
+        //ホールドが１回目の時
+        if (_holdBlock == null)
+        {
+            //現在のブロックを生成
+            _holdBlock = Instantiate(_activeBlock, _holdBlockPosition, Quaternion.identity);
+            //ブロック削除
+            Destroy(_activeBlock.gameObject);
+            Destroy(_ghostBlock.gameObject);
+            //ブロック生成
+            _activeBlock = _spawner.SpwnBlock();
+            //ゴーストブロック生成
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            //色を変える
+            ColorChange();
+            //タイムの初期化
+            ResetTime();
+        }
+        //ホールドが2回目の時
+        else
+        {
+            //ブロックの入れ替え
+            _saveBlock = _activeBlock;
+            _activeBlock = _holdBlock;
+            _holdBlock = _saveBlock;
+
+            //元のブロックを削除
+            Destroy(_saveBlock.gameObject);
+            Destroy(_activeBlock.gameObject);
+            Destroy(_ghostBlock.gameObject);
+            //新しくブロックを生成
+            _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
+            //Iミノだったら位置調整
+            if (_activeBlock.GetISpin)
             {
-                //現在のブロックを生成
-                _holdBlock = Instantiate(_activeBlock, _holdBlockPosition, Quaternion.identity);
-                //ブロック削除
-                Destroy(_activeBlock.gameObject);
-                Destroy(_ghostBlock.gameObject);
-                //ブロック生成
-                _activeBlock = _spawner.SpwnBlock();
-                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
-                //色を変える
-                ColorChange();
-                //タイムの初期化
-                ResetTime();
+                _activeBlock.transform.position += _ghostBlockPosition;
+            }
+            _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            //色を変える
+            ColorChange();
+            //ホールドブロックを削除
+            Destroy(_holdBlock.gameObject);
+            //表示ようホールドブロック生成
+            _holdBlock = Instantiate(_saveBlock, _holdBlockPosition, Quaternion.identity);
+            //タイムの初期化
+            ResetTime();
+        }
+    }
+    /// <summary>
+    /// ハードドロップさせる
+    /// </summary>
+    private void HardDrop()
+    {
+        //ぶつかるまで繰り返す
+        while (_bord.CheckPosition(_activeBlock))
+        {
+            //下に動かす
+            _activeBlock.MoveDown();
+        }
+        //底についた処理
+        BottomBoard();
+    }
+    /// <summary>
+    /// 右に移動する
+    /// </summary>
+    private void MoveRight()
+    {
+        //固定まで判定
+        BlockLook();
+        //右に動かす
+        _activeBlock.MoveRight();
+        _ghostBlock.MoveRight();
+        //タイマー更新
+        _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
+        //はみ出してたら戻す
+        if (!_bord.CheckPosition(_activeBlock))
+        {
+            //左に戻す
+            _activeBlock.MoveLeft();
+            _ghostBlock.MoveLeft();
+        }
+    }
+    /// <summary>
+    /// 左移動をする
+    /// </summary>
+    private void MoveLeft()
+    {
+        //固定まで判定
+        BlockLook();
+        //左に動かす
+        _activeBlock.MoveLeft();
+        _ghostBlock.MoveLeft();
+        //タイマー更新
+        _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
+        //はみ出してたら戻す
+        if (!_bord.CheckPosition(_activeBlock))
+        {
+            //右に戻す
+            _activeBlock.MoveRight();
+            _ghostBlock.MoveRight();
+        }
+    }
+    /// <summary>
+    /// 右回転をする
+    /// </summary>
+    private void RotationRight()
+    {
+        //固定まで判定
+        BlockLook();
+        //右回転
+        _activeBlock.RotateRight();
+        _ghostBlock.RotateRight();
+        //タイマー更新
+        _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
+        //はみ出たら戻す
+        if (!_bord.CheckPosition(_activeBlock))
+        {
+            //Tミノブロックの時
+            if (_activeBlock.GetSuperspin)
+            {
+                //Tミノの右回転補正を行う
+                TRotationRight();
+            }
+            //Iミノブロックの時
+            if (_activeBlock.GetISpin)
+            {
+                //Iミノブロックの右回転補正
+                IRotationRight();
+            }
+        }
+    }
+    private void RotationLeft()
+    {
+        //固定まで判定
+        BlockLook();
+        //左回転
+        _activeBlock.RotateLeft();
+        _ghostBlock.RotateLeft();
+        //タイマー更新
+        _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
+        //はみ出たら戻す
+        if (!_bord.CheckPosition(_activeBlock))
+        {
+            //Tミノブロックの時
+            if (_activeBlock.GetSuperspin)
+            {
+                //Tミノの左回転補正を行う
+                TRotationLeft();
+            }
+            //Iミノブロックの時
+            if (_activeBlock.GetISpin)
+            {
+                //Iミノブロックの左回転補正
+                IRotationLeft();
+            }
+        }
+    }
+    /// <summary>
+    /// 落下速度を早くする
+    /// </summary>
+    private void SoftDrop()
+    {
+        //下に動かす
+        _activeBlock.MoveDown();
+        //入力タイムカウントする
+        _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
+        _nextDropTimer = Time.time + _dropInterval;
+
+        //はみ出してたら戻す
+        if (!_bord.CheckPosition(_activeBlock))
+        {
+            //範囲外だとゲームオーバー
+            if (_bord.GameOverLimit(_activeBlock))
+            {
+                GameOver();
             }
             else
             {
-                //ブロックの入れ替え
-                _saveBlock = _activeBlock;
-                _activeBlock = _holdBlock;
-                _holdBlock = _saveBlock;
-
-                //元のブロックを削除
-                Destroy(_saveBlock.gameObject);
-                Destroy(_activeBlock.gameObject);
-                Destroy(_ghostBlock.gameObject);
-                //新しくブロックを生成
-                _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
-                //Iミノだったら位置調整
-                if (_activeBlock.GetISpin)
+                //着地したらカウント開始
+                if (!_isGround)
                 {
-                    _activeBlock.transform.position += _ghostBlockPosition;
+                    _isGround = true;
+                    _lookTime = Time.time + _lookTimeInterval;
                 }
-                _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position , Quaternion.identity);
-                //色を変える
-                ColorChange();
-                //ホールドブロックを削除
-                Destroy(_holdBlock.gameObject);
-                //表示ようホールドブロック生成
-                _holdBlock = Instantiate(_saveBlock, _holdBlockPosition, Quaternion.identity);
-                //タイムの初期化
-                ResetTime();
+                //底についた処理
+                BottomBoard();
             }
         }
     }
@@ -312,7 +388,7 @@ public class GameManagerScript : MonoBehaviour
             //TSpinであるか判定
             _bord.TSpinCheck(_activeBlock);
             //ホールドをできるように
-            isChangeBlock = false;
+            _isChangeBlock = false;
             //ブロックを消して次のブロックを生成
             Destroy(_ghostBlock.gameObject);
             _activeBlock = _spawner.SpwnBlock();
@@ -322,7 +398,7 @@ public class GameManagerScript : MonoBehaviour
             //値の初期化
             ResetTime();
             _moveCount = 0;
-            isGround = false;
+            _isGround = false;
             //揃っていれば削除
             _bord.ClearAllRows();
         }
@@ -340,14 +416,15 @@ public class GameManagerScript : MonoBehaviour
             _gameOverPanel.SetActive(true);
         }
         //ゲームオーバーにする
-        isGameOver = true;
+        _isGameOver = true;
     }
     /// <summary>
     /// シーンを呼び出す
     /// </summary>
     public void Restart()
     {
-        SceneManager.LoadScene(0);
+        //呼び出すシーン
+        SceneManager.LoadScene(_titleScen);
     }
     /// <summary>
     /// ぶつかるまで下におとす
@@ -356,9 +433,10 @@ public class GameManagerScript : MonoBehaviour
     {
         //ゴーストブロックの位置を親の場所に移動
         _ghostBlock.transform.position = _activeBlock.transform.position;
-        //ぶつかるまで下に動かす
+        //ぶつかるまで繰り返す
         while (_bord.CheckPosition(_ghostBlock))
         {
+            //下に落とす
             _ghostBlock.MoveDown();
         }
         //ぶつかったら１つ上に
@@ -542,7 +620,7 @@ public class GameManagerScript : MonoBehaviour
             }
         }
     }
-   
+
     /// <summary>
     /// 右回転の回転補正
     /// </summary>

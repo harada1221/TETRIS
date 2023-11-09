@@ -802,6 +802,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1059514531}
   m_CullTransparentMesh: 1
+--- !u!1 &1160974884
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1160974886}
+  - component: {fileID: 1160974885}
+  m_Layer: 0
+  m_Name: ScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1160974885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160974884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4436e8e489610b47aba0a8b8fd845ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _addScore: 1000
+  _scoreText: {fileID: 580054942}
+  _deleteType: {fileID: 2035679597}
+--- !u!4 &1160974886
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160974884}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.549309, y: 10.229995, z: -3.175901}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1173708607
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,8 +882,6 @@ MonoBehaviour:
   _height: 30
   _width: 10
   _header: 21
-  _scoreText: {fileID: 580054942}
-  _deleteType: {fileID: 2035679597}
 --- !u!4 &1173708609
 Transform:
   m_ObjectHideFlags: 0
@@ -965,6 +1010,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _colorWhite: {r: 1, g: 1, b: 1, a: 1}
+  _titleScen: Tetris
   _dropInterval: 0.5
   _moveCount: 15
   _nextKeyDownTimeInterval: 0.02
@@ -1675,3 +1721,4 @@ SceneRoots:
   - {fileID: 1367839407}
   - {fileID: 964191414}
   - {fileID: 2000546526}
+  - {fileID: 1160974886}
