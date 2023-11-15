@@ -14,7 +14,7 @@ public class SpawnerScript : MonoBehaviour
     private BlockScript[] _saveBloocks = new BlockScript[3];
 
     //Iミノの位置調整
-    private Vector3 _minoBlockRevision = new Vector3(0.5f, 0.5f, 0);
+    private Vector3 _minoBlockRevision = new Vector3(0.5f,0.5f, 0);
 
     //ネクストミノを表示させるそれぞれの位置
     private Vector3 _nestFastPosition = new Vector3(10, -6, 0);

@@ -458,6 +458,7 @@ public class GameManagerScript : MonoBehaviour
             chidren.color = _colorWhite;
         }
     }
+    //スーパーローテーションは別クラスにする
     /// <summary>
     /// 左回転の回転補正
     /// </summary>

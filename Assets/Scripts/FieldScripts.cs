@@ -1,3 +1,9 @@
+//--------------------------------------
+//作成日10/20
+//作成者原田
+//
+//フィールドの管理
+//--------------------------------------
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

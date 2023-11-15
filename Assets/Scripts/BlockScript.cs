@@ -5,22 +5,22 @@ using UnityEngine;
 public class BlockScript : MonoBehaviour
 {
     [SerializeField, Header("回転させるか")]
-    private bool isRotate = true;
+    private bool _isRotate = true;
 
     [SerializeField, Header("スーパーローテーション判定")]
-    private bool isSuperRotatiion = true;
+    private bool _isSuperRotatiion = true;
 
     [SerializeField, Header("Tスピン判定")]
-    private bool isTSpin = default;
+    private bool _isTSpin = default;
 
     [SerializeField, Header("Iミノ")]
-    private bool isISpin = default;
+    private bool _isISpin = default;
     //スパローテーションができるか
-    public bool GetSuperspin { get => isSuperRotatiion; }
+    public bool GetSuperspin { get => _isSuperRotatiion; }
     //Tミノブロックか
-    public bool GetTspin { get => isTSpin; }
+    public bool GetTspin { get => _isTSpin; }
     //Iミノブロックか
-    public bool GetISpin { get => isISpin; }
+    public bool GetISpin { get => _isISpin; }
     /// <summary>
     /// 移動させる
     /// </summary>
@@ -62,7 +62,7 @@ public class BlockScript : MonoBehaviour
     /// </summary>
     public void RotateRight()
     {
-        if (isRotate)
+        if (_isRotate)
         {
             transform.Rotate(0, 0, -90);
         }
@@ -72,7 +72,7 @@ public class BlockScript : MonoBehaviour
     /// </summary>
     public void RotateLeft()
     {
-        if (isRotate)
+        if (_isRotate)
         {
             transform.Rotate(0, 0, 90);
         }
