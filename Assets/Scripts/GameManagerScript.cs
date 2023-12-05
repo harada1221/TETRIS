@@ -7,7 +7,7 @@ public class GameManagerScript : MonoBehaviour
 {
     [SerializeField, Header("ゴーストブロックの色")]
     private Color _colorWhite = default;
-    [SerializeField,Header("タイトルのシーン")]
+    [SerializeField, Header("タイトルのシーン")]
     private string _titleScen = default;
     //ゴーストブロックの位置調整
     private Vector3 _ghostBlockPosition = new Vector3(0.5f, 0.5f, 0);
@@ -277,21 +277,12 @@ public class GameManagerScript : MonoBehaviour
         _ghostBlock.RotateRight();
         //タイマー更新
         _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
-        //はみ出たら戻す
+        //フィールドの外に出たか
         if (!_bord.CheckPosition(_activeBlock))
         {
-            //Tミノブロックの時
-            if (_activeBlock.GetSuperspin)
-            {
-                //Tミノの右回転補正を行う
-                TRotationRight();
-            }
-            //Iミノブロックの時
-            if (_activeBlock.GetISpin)
-            {
-                //Iミノブロックの右回転補正
-                IRotationRight();
-            }
+            //左回転
+            _activeBlock.RotateLeft();
+            _ghostBlock.RotateLeft();
         }
     }
     private void RotationLeft()
@@ -303,21 +294,12 @@ public class GameManagerScript : MonoBehaviour
         _ghostBlock.RotateLeft();
         //タイマー更新
         _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
-        //はみ出たら戻す
+        //フィールドの外に出たか
         if (!_bord.CheckPosition(_activeBlock))
         {
-            //Tミノブロックの時
-            if (_activeBlock.GetSuperspin)
-            {
-                //Tミノの左回転補正を行う
-                TRotationLeft();
-            }
-            //Iミノブロックの時
-            if (_activeBlock.GetISpin)
-            {
-                //Iミノブロックの左回転補正
-                IRotationLeft();
-            }
+            //右回転させる
+            _activeBlock.RotateRight();
+            _ghostBlock.RotateRight();
         }
     }
     /// <summary>
@@ -385,8 +367,6 @@ public class GameManagerScript : MonoBehaviour
         {
             //配列に格納
             _bord.SaveBlockInGrid(_activeBlock);
-            //TSpinであるか判定
-            _bord.TSpinCheck(_activeBlock);
             //ホールドをできるように
             _isChangeBlock = false;
             //ブロックを消して次のブロックを生成
@@ -423,7 +403,7 @@ public class GameManagerScript : MonoBehaviour
     /// </summary>
     public void Restart()
     {
-        //呼び出すシーン
+        //ボタンで呼び出すシーン
         SceneManager.LoadScene(_titleScen);
     }
     /// <summary>
@@ -443,12 +423,14 @@ public class GameManagerScript : MonoBehaviour
         _ghostBlock.MoveUp();
     }
     /// <summary>
-    /// オブジェクトの色を変える
+    /// ゴーストブロックの色を変える
     /// </summary>
     private void ColorChange()
     {
+        //親オブジェクト
         Transform parent = _ghostBlock.transform;
-        SpriteRenderer chidren;
+        //子オブジェクトのSpriteRenderer
+        SpriteRenderer chidren = default;
 
         // 子オブジェクトを全て取得する
         foreach (Transform child in parent)
@@ -457,451 +439,5 @@ public class GameManagerScript : MonoBehaviour
             chidren = child.GetComponent<SpriteRenderer>();
             chidren.color = _colorWhite;
         }
-    }
-    //スーパーローテーションは別クラスにする
-    /// <summary>
-    /// 左回転の回転補正
-    /// </summary>
-    private void TRotationLeft()
-    {
-        switch (_activeBlock.transform.rotation.eulerAngles.z)
-        {
-            case 0:
-                LeftAngleZero();
-                break;
-            case 90:
-                LeftAngleNinety();
-                break;
-            case 180:
-                LeftAngleHundred();
-                break;
-            case 270:
-                LeftAngleTwoHundred();
-                break;
-
-        }
-    }
-    /// <summary>
-    /// 角度が0度の左回転
-    /// </summary>
-    private void LeftAngleZero()
-    {
-        //ぶつからなくなるまで繰り返す
-        for (int i = 0; i <= 4; i++)
-        {
-            switch (i)
-            {
-                case 0:
-                    _activeBlock.transform.position += new Vector3(1, 0, 0);
-                    break;
-                case 1:
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                    break;
-                case 2:
-                    _activeBlock.transform.position += new Vector3(-1, 3, 0);
-                    break;
-                case 3:
-                    _activeBlock.transform.position += new Vector3(1, 0, 0);
-                    break;
-                case 4:
-                    //ぶつからなかったら元に戻す
-                    _activeBlock.transform.position += new Vector3(-1, -2, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                    break;
-            }
-            if (_bord.CheckPosition(_activeBlock))
-            {
-                break;
-            }
-        }
-    }
-    /// <summary>
-    /// 角度が90度の左回転
-    /// </summary>
-    private void LeftAngleNinety()
-    {  //ぶつからなくなるまで繰り返す
-        for (int i = 0; i <= 4; i++)
-        {
-            switch (i)
-            {
-                case 0:
-                    _activeBlock.transform.position += new Vector3(1, 0, 0);
-                    break;
-                case 1:
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                    break;
-                case 2:
-                    _activeBlock.transform.position += new Vector3(-1, -3, 0);
-                    break;
-                case 3:
-                    _activeBlock.transform.position += new Vector3(1, 0, 0);
-                    break;
-                case 4:
-                    //ぶつからなかったら元に戻す
-                    _activeBlock.transform.position += new Vector3(-1, 2, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                    break;
-            }
-            if (_bord.CheckPosition(_activeBlock))
-            {
-                break;
-            }
-        }
-
-    }
-    /// <summary>
-    ///  角度が180度の左回転
-    /// </summary>
-    private void LeftAngleHundred()
-    {
-        //ぶつからなくなるまで繰り返す
-        for (int i = 0; i <= 4; i++)
-        {
-            switch (i)
-            {
-                case 0:
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                    break;
-                case 1:
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                    break;
-                case 2:
-                    _activeBlock.transform.position += new Vector3(1, 3, 0);
-                    break;
-                case 3:
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                    break;
-                case 4:
-                    //ぶつからなかったら元に戻す
-                    _activeBlock.transform.position += new Vector3(1, -2, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                    break;
-            }
-            if (_bord.CheckPosition(_activeBlock))
-            {
-                break;
-            }
-        }
-    }
-    /// <summary>
-    ///  角度が270度の左回転
-    /// </summary>
-    private void LeftAngleTwoHundred()
-    {
-        //ぶつからなくなるまで繰り返す
-        for (int i = 0; i <= 4; i++)
-        {
-            switch (i)
-            {
-                case 0:
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                    break;
-                case 1:
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                    break;
-                case 2:
-                    _activeBlock.transform.position += new Vector3(1, -3, 0);
-                    break;
-                case 3:
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                    break;
-                case 4:
-                    //ぶつからなかったら元に戻す
-                    _activeBlock.transform.position += new Vector3(1, 2, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                    break;
-            }
-            if (_bord.CheckPosition(_activeBlock))
-            {
-                break;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 右回転の回転補正
-    /// </summary>
-    private void TRotationRight()
-    {
-        switch (_activeBlock.transform.rotation.eulerAngles.z)
-        {
-            case 0:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, -2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-            case 90:
-                _activeBlock.transform.position += new Vector3(1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-            case 270:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-            case 180:
-                _activeBlock.transform.position += new Vector3(1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, -2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-        }
-
-    }
-    /// <summary>
-    /// Iミノブロックの左回転補正
-    /// </summary>
-    private void IRotationLeft()
-    {
-        switch (_activeBlock.transform.rotation.eulerAngles.z)
-        {
-            case 0:
-                _activeBlock.transform.position += new Vector3(2, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(1, 2, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                }
-                break;
-            case 90:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 2, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-2, 1, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                }
-                break;
-            case 180:
-                _activeBlock.transform.position += new Vector3(1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-1, -2, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                }
-                break;
-            case 270:
-                _activeBlock.transform.position += new Vector3(1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(2, -1, 0);
-                    _activeBlock.RotateRight();
-                    _ghostBlock.RotateRight();
-                }
-                break;
-        }
-    }
-    /// <summary>
-    /// Iミノブロックの右回転補正
-    /// </summary>
-    private void IRotationRight()
-    {
-        switch (_activeBlock.transform.rotation.eulerAngles.z)
-        {
-            case 0:
-                _activeBlock.transform.position += new Vector3(-2, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, -2, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(2, -2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-
-            case 90:
-                _activeBlock.transform.position += new Vector3(2, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(0, 1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(2, 2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-            case 180:
-                _activeBlock.transform.position += new Vector3(-1, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 2, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, -3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(2, 2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-            case 270:
-                _activeBlock.transform.position += new Vector3(-2, 0, 0);
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 0, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-3, -1, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(3, 3, 0);
-                }
-                if (!_bord.CheckPosition(_activeBlock))
-                {
-                    _activeBlock.transform.position += new Vector3(-2, -2, 0);
-                    _activeBlock.RotateLeft();
-                    _ghostBlock.RotateLeft();
-                }
-                break;
-        }
-
     }
 }

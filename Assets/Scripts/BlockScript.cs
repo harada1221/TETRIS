@@ -1,3 +1,9 @@
+/*FieldScript
+ * 制作日　10月27日
+ * 制作者　原田智大
+ * 
+ * ブロックの移動をするスクリプト
+ */
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,19 +12,8 @@ public class BlockScript : MonoBehaviour
 {
     [SerializeField, Header("回転させるか")]
     private bool _isRotate = true;
-
-    [SerializeField, Header("スーパーローテーション判定")]
-    private bool _isSuperRotatiion = true;
-
-    [SerializeField, Header("Tスピン判定")]
-    private bool _isTSpin = default;
-
     [SerializeField, Header("Iミノ")]
     private bool _isISpin = default;
-    //スパローテーションができるか
-    public bool GetSuperspin { get => _isSuperRotatiion; }
-    //Tミノブロックか
-    public bool GetTspin { get => _isTSpin; }
     //Iミノブロックか
     public bool GetISpin { get => _isISpin; }
     /// <summary>

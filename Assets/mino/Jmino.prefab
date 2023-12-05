@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1501662784559649979}
   m_Layer: 0
   m_Name: Square
-  m_TagString: Untagged
+  m_TagString: MinoBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 8851081866394047317}
   m_Layer: 0
   m_Name: Square (2)
-  m_TagString: Untagged
+  m_TagString: MinoBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 956938057902913112}
   m_Layer: 0
   m_Name: Square (1)
-  m_TagString: Untagged
+  m_TagString: MinoBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -300,9 +300,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e84e653115d26c43956e680d589b947, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRotate: 1
-  isSuperRotatiion: 1
-  isTSpin: 0
+  _isRotate: 1
+  _isISpin: 0
 --- !u!1 &8527124326836376565
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,7 +314,7 @@ GameObject:
   - component: {fileID: 7859360315678202877}
   m_Layer: 0
   m_Name: Square (3)
-  m_TagString: Untagged
+  m_TagString: MinoBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
