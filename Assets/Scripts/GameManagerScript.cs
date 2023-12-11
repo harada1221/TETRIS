@@ -30,7 +30,7 @@ public class GameManagerScript : MonoBehaviour
     private float _nextDropTimer = default;
 
     //フィールドのスクリプト
-    private FieldScripts _bord = default;
+    private FieldScripts _fildScript = default;
     //入力のタイム
     private float _nextKeyDownTime = default;
     private float _nextKeySideTime = default;
@@ -66,7 +66,7 @@ public class GameManagerScript : MonoBehaviour
         //スポナーオブジェクトを格納
         _spawner = GameObject.FindObjectOfType<SpawnerScript>();
         //ボードのスクリプトを格納
-        _bord = GameObject.FindObjectOfType<FieldScripts>();
+        _fildScript = GameObject.FindObjectOfType<FieldScripts>();
 
         //タイマーの初期設定
         _nextKeyDownTime = Time.time + _nextKeyDownTimeInterval;
@@ -105,7 +105,6 @@ public class GameManagerScript : MonoBehaviour
         //ゴーストブロックを下まで落とす
         DownGhostBlock();
         //プレイヤーの操作
-        //プレイヤーのインプットをゲームマネージャに書くのはよくない別クラスにすべき
         PlayerInput();
     }
     /// <summary>
@@ -170,8 +169,8 @@ public class GameManagerScript : MonoBehaviour
             //現在のブロックを生成
             _holdBlock = Instantiate(_activeBlock, _holdBlockPosition, Quaternion.identity);
             //ブロック削除
-            Destroy(_activeBlock.gameObject);
-            Destroy(_ghostBlock.gameObject);
+            _activeBlock.gameObject.SetActive(false);
+            _ghostBlock.gameObject.SetActive(false);
             //ブロック生成
             _activeBlock = _spawner.SpwnBlock();
             //ゴーストブロック生成
@@ -190,23 +189,28 @@ public class GameManagerScript : MonoBehaviour
             _holdBlock = _saveBlock;
 
             //元のブロックを削除
-            Destroy(_saveBlock.gameObject);
-            Destroy(_activeBlock.gameObject);
-            Destroy(_ghostBlock.gameObject);
+            _activeBlock.gameObject.SetActive(false);
+            _ghostBlock.gameObject.SetActive(false);
+            _holdBlock.gameObject.SetActive(false);
+
             //新しくブロックを生成
             _activeBlock = Instantiate(_activeBlock, _spawner.transform.position, Quaternion.identity);
+            //ブロックの表示
+            _activeBlock.gameObject.SetActive(true);
             //Iミノだったら位置調整
             if (_activeBlock.GetISpin)
             {
                 _activeBlock.transform.position += _ghostBlockPosition;
             }
+            //ゴーストブロック生成
             _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            //ゴーストブロック表示
+            _ghostBlock.gameObject.SetActive(true);
             //色を変える
             ColorChange();
-            //ホールドブロックを削除
-            Destroy(_holdBlock.gameObject);
             //表示ようホールドブロック生成
             _holdBlock = Instantiate(_saveBlock, _holdBlockPosition, Quaternion.identity);
+            _holdBlock.gameObject.SetActive(true);
             //タイムの初期化
             ResetTime();
         }
@@ -217,7 +221,7 @@ public class GameManagerScript : MonoBehaviour
     private void HardDrop()
     {
         //ぶつかるまで繰り返す
-        while (_bord.CheckPosition(_activeBlock))
+        while (_fildScript.CheckPosition(_activeBlock))
         {
             //下に動かす
             _activeBlock.MoveDown();
@@ -238,7 +242,7 @@ public class GameManagerScript : MonoBehaviour
         //タイマー更新
         _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
         //はみ出してたら戻す
-        if (!_bord.CheckPosition(_activeBlock))
+        if (!_fildScript.CheckPosition(_activeBlock))
         {
             //左に戻す
             _activeBlock.MoveLeft();
@@ -258,7 +262,7 @@ public class GameManagerScript : MonoBehaviour
         //タイマー更新
         _nextKeySideTime = Time.time + _nextKeySideTimeInterval;
         //はみ出してたら戻す
-        if (!_bord.CheckPosition(_activeBlock))
+        if (!_fildScript.CheckPosition(_activeBlock))
         {
             //右に戻す
             _activeBlock.MoveRight();
@@ -278,7 +282,7 @@ public class GameManagerScript : MonoBehaviour
         //タイマー更新
         _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
         //フィールドの外に出たか
-        if (!_bord.CheckPosition(_activeBlock))
+        if (!_fildScript.CheckPosition(_activeBlock))
         {
             //左回転
             _activeBlock.RotateLeft();
@@ -295,7 +299,7 @@ public class GameManagerScript : MonoBehaviour
         //タイマー更新
         _nextKeyRotateTime = Time.time + _nextKeyRotateTimeInterval;
         //フィールドの外に出たか
-        if (!_bord.CheckPosition(_activeBlock))
+        if (!_fildScript.CheckPosition(_activeBlock))
         {
             //右回転させる
             _activeBlock.RotateRight();
@@ -314,10 +318,10 @@ public class GameManagerScript : MonoBehaviour
         _nextDropTimer = Time.time + _dropInterval;
 
         //はみ出してたら戻す
-        if (!_bord.CheckPosition(_activeBlock))
+        if (!_fildScript.CheckPosition(_activeBlock))
         {
             //範囲外だとゲームオーバー
-            if (_bord.GameOverLimit(_activeBlock))
+            if (_fildScript.GameOverLimit(_activeBlock))
             {
                 GameOver();
             }
@@ -366,7 +370,7 @@ public class GameManagerScript : MonoBehaviour
         if (Time.time > _lookTime || Input.GetKeyDown(KeyCode.W) || _moveCount >= 15)
         {
             //配列に格納
-            _bord.SaveBlockInGrid(_activeBlock);
+            _fildScript.SaveBlockInGrid(_activeBlock);
             //ホールドをできるように
             _isChangeBlock = false;
             //ブロックを消して次のブロックを生成
@@ -380,7 +384,7 @@ public class GameManagerScript : MonoBehaviour
             _moveCount = 0;
             _isGround = false;
             //揃っていれば削除
-            _bord.ClearAllRows();
+            _fildScript.ClearAllRows();
         }
     }
     /// <summary>
@@ -414,7 +418,7 @@ public class GameManagerScript : MonoBehaviour
         //ゴーストブロックの位置を親の場所に移動
         _ghostBlock.transform.position = _activeBlock.transform.position;
         //ぶつかるまで繰り返す
-        while (_bord.CheckPosition(_ghostBlock))
+        while (_fildScript.CheckPosition(_ghostBlock))
         {
             //下に落とす
             _ghostBlock.MoveDown();

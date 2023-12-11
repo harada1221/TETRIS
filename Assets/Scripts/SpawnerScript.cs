@@ -97,7 +97,7 @@ public class SpawnerScript : MonoBehaviour
         {
             if (_saveBloocks[j] != null)
             {
-                Destroy(_saveBloocks[j].gameObject);
+                _saveBloocks[j].gameObject.SetActive(false);
             }
         }
         //1つ先のブロックを決定するindex値
@@ -162,6 +162,14 @@ public class SpawnerScript : MonoBehaviour
             }
         }
         //BlockScriptの配列を渡す
+        //ネクストを表示
+        for (int j = 0; j < _saveBloocks.Length; j++)
+        {
+            if (_saveBloocks[j] != null)
+            {
+                _saveBloocks[j].gameObject.SetActive(true);
+            }
+        }
         return _saveBloocks;
     }
 }

@@ -108,9 +108,9 @@ public class FieldScripts : MonoBehaviour
             {
                 //列を消す
                 LineDelete(y);
-                //列を下げる
+                ////列を下げる
                 //LinesDown(y + 1);
-                //yの値を戻す
+                ////yの値を戻す
                 //y--;
             }
         }
@@ -156,15 +156,11 @@ public class FieldScripts : MonoBehaviour
                 //ポジションが同じかどうか
                 if (_minoBlocks[i].transform.position == checkPsosition)
                 {
-                    Debug.Log("in");
                     //ブロックを消す
                     _minoBlocks[i].SetActive(false);
                     //消した場所を初期化する
                     _grid[x, y] = 0;
-                    //上の列を下げる
-                    LinesDown(x, y + 1, _minoBlocks[i]);
-                    //yの値を戻す
-                    y--;
+                    LinesDown(checkPsosition);
                 }
             }
         }
@@ -174,26 +170,26 @@ public class FieldScripts : MonoBehaviour
     /// <summary>
     /// 列を下に下げる
     /// </summary>
-    /// <param name="startX">消したブロックのX座標</param>
-    /// <param name="startY">消したブロックのY座標</param>
-    /// <param name="blocks">動かすブロック</param>
-    private void LinesDown(int startX, int startY, GameObject blocks)
+    private void LinesDown(Vector3 startPosition)
     {
-        //置いた場所から上限まで繰り返す
-        for (int y = startY; y < _height; y++)
+        float x = default;
+        float y = default;
+        for (int i = 0; i < _minoBlocks.Length; i++)
         {
-            if (_grid[startX, y] == 0)
+            x = _minoBlocks[i].transform.position.x;
+            y = _minoBlocks[i].transform.position.y;
+            if (x == startPosition.x && y > startPosition.y)
             {
-                continue;
-            }
-            _grid[startX, y - 1] = _grid[startX, y];
-            _grid[startX, y] = 0;
-            for(int i = 0; i < _minoBlocks.Length; i++)
-            {
-                if (blocks.transform.position.y < _minoBlocks[i].transform.position.y&&blocks.transform.position.x==_minoBlocks[i].transform.position.x)
+                if (_grid[(int)x, (int)y] == 0)
                 {
-                    _minoBlocks[i].transform.position += Vector3.down;
+                    continue;
                 }
+                //配列を下にずらす
+                _grid[(int)x, (int)y - 1] = _grid[(int)x, (int)y];
+                //ずらした場所をnullにする
+                _grid[(int)x, (int)y] = 0;
+                //オブジェクトを下に動かす
+                _minoBlocks[i].transform.position += Vector3.down;
             }
         }
         ////置いた場所から上限まで繰り返す
