@@ -1,5 +1,5 @@
 //--------------------------------------
-//作成日10/20
+//作成日1/20
 //作成者原田
 //
 //フィールドの管理
@@ -92,7 +92,7 @@ public class FieldScripts : MonoBehaviour
             //配列に格納する
             pos = RoundingScript.Round(Item.position);
             _grid[(int)pos.x, (int)pos.y] = 1;
-            Debug.Log(_grid[(int)pos.x, (int)pos.y] + "+++" + (int)pos.x + "+++" + (int)pos.y);
+            //Debug.Log(_grid[(int)pos.x, (int)pos.y] + "+++" + (int)pos.x + "+++" + (int)pos.y);
         }
 
     }
@@ -107,6 +107,7 @@ public class FieldScripts : MonoBehaviour
             //揃った列があるかどうか
             if (LineCheck(y))
             {
+                //Debug.Log("そろった");
                 //列を消す
                 LineDelete(y);
                 ////列を下げる
@@ -155,13 +156,22 @@ public class FieldScripts : MonoBehaviour
             for (int i = 0; i < _minoBlocks.Length; i++)
             {
                 //ポジションが同じかどうか
-                if ((int)_minoBlocks[i].transform.position.x == (int)checkPsosition.x && (int)_minoBlocks[i].transform.position.y == (int)checkPsosition.y && _minoBlocks[i].activeInHierarchy)
+                if (_minoBlocks[i].transform.position == checkPsosition && _minoBlocks[i].activeInHierarchy)
                 {
                     //ブロックを消す
                     _minoBlocks[i].SetActive(false);
-                    Debug.Log(_minoBlocks[i].transform.position);
+                    for (int k = 0; k < _grid.GetLength(0); k++)
+                    {
+                        string str = "";
+                        for (int j = 0; j < _grid.GetLength(1); j++)
+                        {
+                            str = str + _grid[k, j] + " ";
+                        }
+                        Debug.Log(str + "前");
+                    }
                     //消した場所を初期化する
                     _grid[x, y] = 0;
+
                     LinesDown(checkPsosition);
                 }
             }
@@ -174,26 +184,51 @@ public class FieldScripts : MonoBehaviour
     /// </summary>
     private void LinesDown(Vector3 startPosition)
     {
+        for (int i = 0; i < _grid.GetLength(0); i++)
+        {
+            string str = "";
+            for (int j = 0; j < _grid.GetLength(1); j++)
+            {
+                str = str + _grid[i, j] + " ";
+            }
+            Debug.Log(str + "中");
+        }
         float x = default;
         float y = default;
-        for (int i = 0; i < _minoBlocks.Length; i++)
+        for (int i = _minoBlocks.Length - 1; i > 0; i--)
         {
             x = _minoBlocks[i].transform.position.x;
             y = _minoBlocks[i].transform.position.y;
-            if ((int)x == (int)startPosition.x && (int)y > (int)startPosition.y && _minoBlocks[i].activeInHierarchy)
+            if ((int)x == (int)startPosition.x && y > startPosition.y)
             {
+                //Debug.Log(_minoBlocks[i].transform.position);
+                //Debug.Log(_grid[(int)x, (int)y]);
                 if (_grid[(int)x, (int)y] == 0)
                 {
                     continue;
                 }
-                Debug.Log((int)x + "+++" + (int)y + _minoBlocks[i].gameObject.name);
+                //Debug.Log(_minoBlocks[i].transform.position);
+                //Debug.Log("入った" + _minoBlocks[i].gameObject.name);
+                //Debug.Log((int)x + "+++" + (int)y + _minoBlocks[i].gameObject.name);
                 //配列を下にずらす
                 _grid[(int)x, (int)y - 1] = _grid[(int)x, (int)y];
                 //ずらした場所をnullにする
-                _grid[(int)x, (int)y] = 0;
+                //_grid[(int)x, (int)y] = 0;
                 //オブジェクトを下に動かす
-                //_minoBlocks[i].transform.position += Vector3.down;
+                //Debug.Log("雨後刺した");
+                _minoBlocks[i].transform.position += Vector3.down;
+                //Debug.Log(_minoBlocks[i].transform.position);
+                //Debug.Log(_grid[(int)x, (int)y]);
             }
+        }
+        for (int i = 0; i < _grid.GetLength(0); i++)
+        {
+            string str = "";
+            for (int j = 0; j < _grid.GetLength(1); j++)
+            {
+                str = str + _grid[i, j] + " ";
+            }
+            Debug.Log(str + "語");
         }
         ////置いた場所から上限まで繰り返す
         //for (int y = startY; y < _height; y++)
