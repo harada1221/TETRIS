@@ -92,6 +92,7 @@ public class FieldScripts : MonoBehaviour
             //配列に格納する
             pos = RoundingScript.Round(Item.position);
             _grid[(int)pos.x, (int)pos.y] = 1;
+            Debug.Log(_grid[(int)pos.x, (int)pos.y] + "+++" + (int)pos.x + "+++" + (int)pos.y);
         }
 
     }
@@ -100,7 +101,7 @@ public class FieldScripts : MonoBehaviour
     /// </summary>
     public void ClearAllRows()
     {
-        //揃った列を消して1段下げる
+        //高さの上限まで繰り返す
         for (int y = 0; y < _height; y++)
         {
             //揃った列があるかどうか
@@ -154,10 +155,11 @@ public class FieldScripts : MonoBehaviour
             for (int i = 0; i < _minoBlocks.Length; i++)
             {
                 //ポジションが同じかどうか
-                if (_minoBlocks[i].transform.position == checkPsosition)
+                if ((int)_minoBlocks[i].transform.position.x == (int)checkPsosition.x && (int)_minoBlocks[i].transform.position.y == (int)checkPsosition.y && _minoBlocks[i].activeInHierarchy)
                 {
                     //ブロックを消す
                     _minoBlocks[i].SetActive(false);
+                    Debug.Log(_minoBlocks[i].transform.position);
                     //消した場所を初期化する
                     _grid[x, y] = 0;
                     LinesDown(checkPsosition);
@@ -178,18 +180,19 @@ public class FieldScripts : MonoBehaviour
         {
             x = _minoBlocks[i].transform.position.x;
             y = _minoBlocks[i].transform.position.y;
-            if (x == startPosition.x && y > startPosition.y)
+            if ((int)x == (int)startPosition.x && (int)y > (int)startPosition.y && _minoBlocks[i].activeInHierarchy)
             {
                 if (_grid[(int)x, (int)y] == 0)
                 {
                     continue;
                 }
+                Debug.Log((int)x + "+++" + (int)y + _minoBlocks[i].gameObject.name);
                 //配列を下にずらす
                 _grid[(int)x, (int)y - 1] = _grid[(int)x, (int)y];
                 //ずらした場所をnullにする
                 _grid[(int)x, (int)y] = 0;
                 //オブジェクトを下に動かす
-                _minoBlocks[i].transform.position += Vector3.down;
+                //_minoBlocks[i].transform.position += Vector3.down;
             }
         }
         ////置いた場所から上限まで繰り返す

@@ -374,11 +374,11 @@ public class GameManagerScript : MonoBehaviour
             //ホールドをできるように
             _isChangeBlock = false;
             //ブロックを消して次のブロックを生成
-            Destroy(_ghostBlock.gameObject);
+            _ghostBlock.gameObject.SetActive(false);
             _activeBlock = _spawner.SpwnBlock();
             _ghostBlock = Instantiate(_activeBlock, _activeBlock.transform.position, Quaternion.identity);
+            _ghostBlock.gameObject.SetActive(true);
             ColorChange();
-
             //値の初期化
             ResetTime();
             _moveCount = 0;
@@ -442,6 +442,7 @@ public class GameManagerScript : MonoBehaviour
             //SpriteRendererの色を変える
             chidren = child.GetComponent<SpriteRenderer>();
             chidren.color = _colorWhite;
+            child.gameObject.tag = "Untagged";
         }
     }
 }
