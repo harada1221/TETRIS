@@ -203,15 +203,15 @@ public class FieldScripts : MonoBehaviour
             {
                 //Debug.Log(_minoBlocks[i].transform.position);
                 //Debug.Log(_grid[(int)x, (int)y]);
-                if (_grid[(int)x, (int)y] == 0)
-                {
-                    continue;
-                }
+                //if (_grid[(int)x, (int)y] == 0)
+                //{
+                //    continue;
+                //}
                 //Debug.Log(_minoBlocks[i].transform.position);
                 //Debug.Log("入った" + _minoBlocks[i].gameObject.name);
                 //Debug.Log((int)x + "+++" + (int)y + _minoBlocks[i].gameObject.name);
                 //配列を下にずらす
-                _grid[(int)x, (int)y - 1] = _grid[(int)x, (int)y];
+                _grid[(int)x, (int)y] = _grid[(int)x, (int)y + 1];
                 //ずらした場所をnullにする
                 //_grid[(int)x, (int)y] = 0;
                 //オブジェクトを下に動かす
